@@ -9,6 +9,22 @@
 <body class="bg-light">
 <div class="container py-4">
     <h2 class="mb-2">Evaluasi Tengah Semester Murid PKL</h2>
+    @auth
+        <div class="alert alert-secondary d-flex justify-content-between align-items-center py-2 small mb-2">
+            <div>
+                <strong>{{ auth()->user()->email }}</strong>
+                <span class="text-muted ms-2">| <a href="#" onclick="event.preventDefault();document.getElementById('logout-form').submit();">Ganti akun</a></span>
+            </div>
+        </div>
+        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
+        <div class="alert alert-warning small mb-3">
+            Nama, alamat email, dan foto yang terkait dengan Akun Google Anda akan direkam saat Anda mengupload file dan mengirimkan formulir ini.
+        </div>
+    @else
+        <div class="alert alert-secondary small mb-3">
+            Belum login dengan Google. <a href="{{ route('google.redirect') }}">Login dengan akun Google</a> (opsional, Anda masih bisa isi manual tanpa login).
+        </div>
+    @endauth
     <p>Silahkan untuk Presensi selama WFH murid PKL Tahun 2025</p>
     <div class="alert alert-info small">
         <strong>Untuk Presensi dilakukan 3X yaitu</strong><br>
@@ -55,7 +71,7 @@
         </div>
         <div class="mb-3">
             <label class="form-label">Nama Murid PKL *</label>
-            <input type="text" name="nama_murid" class="form-control" value="{{ old('nama_murid') }}" required>
+            <input type="text" name="nama_murid" class="form-control" value="{{ old('nama_murid', auth()->user()->name ?? '') }}" required>
         </div>
         <div class="mb-3">
             <label class="form-label">Kelas (contoh: 12 RPL 1) *</label>
@@ -87,7 +103,7 @@
             </select>
         </div>
         <div class="mb-3">
-            <label class="form-label">Upload Foto Murid PKL (boleh selfi) dilengkapi dengan Timestamp *</label>
+            <label class="form-label">Upload Foto Murid PKL (boleh selfi) dilengkapi dengan Timestamp * (format gambar)</label>
             <input type="file" name="foto_murid" class="form-control" accept="image/*" required>
             <small class="text-muted">Upload 1 file yang didukung: image. Maks 10 MB.</small>
         </div>
@@ -98,6 +114,7 @@
 
     <div class="mt-4 text-center">
         <a href="{{ route('absensi.index') }}" class="small">Lihat Data Presensi</a>
+    <div class="small text-muted mt-2">User Support: <a href="mailto:humas@smkn1-sby.sch.id">humas@smkn1-sby.sch.id</a></div>
     </div>
 </div>
 </body>

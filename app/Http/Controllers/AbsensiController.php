@@ -7,7 +7,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Exports\AbsensiExport;
+use App\Exports\SimpleAbsensiExport;
+use App\Exports\CleanAbsensiExport;
+use App\Exports\LightweightAbsensiExport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Jobs\AppendAbsensiToSheet;
 
 class AbsensiController extends Controller
 {
@@ -44,25 +48,96 @@ class AbsensiController extends Controller
             return back()->withErrors(['sesi_presensi' => 'Presensi untuk sesi ini hanya boleh antara '.$window['start'].' - '.$window['end'].' WIB'])->withInput();
         }
 
+        // Normalisasi nama murid & kelas (trim) untuk pencarian
+        $nama = trim($validated['nama_murid']);
+        $kelas = trim($validated['kelas']);
+        $today = $now->toDateString();
+
+        $exists = Absensi::whereDate('presensi_date', $today)
+            ->where('sesi_presensi', $validated['sesi_presensi'])
+            ->whereRaw('LOWER(nama_murid)=?', [mb_strtolower($nama)])
+            ->whereRaw('LOWER(kelas)=?', [mb_strtolower($kelas)])
+            ->exists();
+        if ($exists) {
+            return back()->withErrors(['sesi_presensi' => 'Anda sudah melakukan presensi untuk sesi ini hari ini.'])->withInput();
+        }
+
         // Simpan foto
         $path = $request->file('foto_murid')->store('absensi_foto', 'public');
 
         $validated['foto_path'] = $path;
         $validated['presensi_at'] = now();
+        $validated['presensi_date'] = $today;
+        $validated['nama_murid'] = $nama; // simpan versi trim
+        $validated['kelas'] = $kelas;
+        if (auth()->check()) {
+            $validated['user_id'] = auth()->id();
+            $validated['user_email'] = auth()->user()->email;
+        }
 
-        Absensi::create($validated);
+    $absensi = Absensi::create($validated);
+
+    // Dispatch job to Google Sheets (queue: default)
+    AppendAbsensiToSheet::dispatch($absensi->id);
 
         return redirect()->route('absensi.create')->with('success', 'Presensi berhasil disimpan. Terima kasih.');
     }
 
     public function index()
     {
-        $data = Absensi::latest()->paginate(25);
+        // Hanya tampilkan data presensi milik user yang sedang login
+        $data = Absensi::where('user_email', auth()->user()->email)
+                      ->latest()
+                      ->paginate(25);
         return view('absensi.index', compact('data'));
     }
 
-    public function export()
+    public function export(Request $request)
     {
-        return Excel::download(new AbsensiExport, 'absensi_'.now()->format('Ymd_His').'.xlsx');
+        // Set memory limit tinggi dan timeout
+        ini_set('memory_limit', '-1'); // Unlimited memory
+        set_time_limit(0); // No timeout
+        
+        $filters = $request->only(['sesi', 'kelas', 'tanggal', 'konsentrasi']);
+        
+        // Cek jumlah data untuk menentukan export method
+        $query = Absensi::query();
+        
+        if (!empty($filters['sesi'])) {
+            $query->where('sesi_presensi', $filters['sesi']);
+        }
+        if (!empty($filters['kelas'])) {
+            $query->where('kelas', 'like', '%'.$filters['kelas'].'%');
+        }
+        if (!empty($filters['tanggal'])) {
+            $query->whereDate('presensi_date', $filters['tanggal']);
+        }
+        if (!empty($filters['konsentrasi'])) {
+            $query->where('konsentrasi_keahlian', $filters['konsentrasi']);
+        }
+        
+        $count = $query->count();
+        
+        $fileName = 'Data_Presensi_PKL_';
+        
+        if ($request->filled('tanggal')) {
+            $fileName .= date('d-m-Y', strtotime($request->tanggal)) . '_';
+        }
+        if ($request->filled('sesi')) {
+            $sesiName = str_replace([' ', '(', ')', '.'], '', $request->sesi);
+            $fileName .= $sesiName . '_';
+        }
+        if ($request->filled('konsentrasi')) {
+            $fileName .= str_replace(' ', '_', $request->konsentrasi) . '_';
+        }
+        
+        $fileName .= now()->format('Ymd_His') . '.xlsx';
+        
+        // Jika data terlalu banyak, gunakan lightweight export
+        if ($count > 500) {
+            return Excel::download(new LightweightAbsensiExport($filters), $fileName);
+        } else {
+            return Excel::download(new SimpleAbsensiExport($filters), $fileName);
+        }
     }
 }

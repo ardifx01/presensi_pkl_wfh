@@ -1,61 +1,175 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistem Presensi PKL Work From Home
+### SMKN 1 Surabaya
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="public/images/logo-smkn1-sby.png" alt="SMKN 1 Surabaya Logo" width="150" height="150" style="object-fit: contain;">
 </p>
 
-## About Laravel
+<p align="center">
+  <strong>Sistem Presensi Digital untuk Praktek Kerja Lapangan (PKL)</strong><br>
+  Sekolah Menengah Kejuruan Negeri 1 Surabaya
+</p>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 📋 Tentang Sistem
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Sistem Presensi PKL Work From Home adalah aplikasi web yang dikembangkan untuk memudahkan siswa SMKN 1 Surabaya dalam melakukan presensi PKL secara digital. Sistem ini menyediakan:
 
-## Learning Laravel
+### ✨ Fitur Utama
+- **🔐 Login dengan Google** - Autentikasi menggunakan akun Google siswa
+- **📝 Form Presensi Digital** - Interface yang mudah digunakan seperti Google Form
+- **📊 Dashboard Admin** - Panel kontrol untuk admin sekolah
+- **📄 Export Excel** - Unduh data presensi dalam format Excel
+- **📱 Responsive Design** - Dapat diakses dari desktop dan mobile
+- **🔒 Data Privacy** - Setiap siswa hanya dapat melihat data presensinya sendiri
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 🎯 Konsentrasi Keahlian yang Didukung
+1. Rekayasa Perangkat Lunak
+2. Teknik Komputer dan Jaringan
+3. Bisnis Digital
+4. Manajemen Perkantoran
+5. Manajemen Logistik
+6. Akuntansi
+7. Perhotelan
+8. Desain Komunikasi Visual
+9. Produksi dan Siaran Program Televisi
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## 🛠️ Teknologi yang Digunakan
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- **Framework**: Laravel 12
+- **Database**: MySQL/SQLite
+- **Frontend**: Bootstrap 5, Blade Templates
+- **Authentication**: Laravel Socialite (Google OAuth)
+- **Export**: Maatwebsite Excel
+- **Storage**: Laravel File Storage
 
-## Laravel Sponsors
+## 📦 Instalasi
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Persyaratan Sistem
+- PHP 8.2 atau lebih tinggi
+- Composer
+- Node.js & NPM
+- MySQL/SQLite
 
-### Premium Partners
+### Langkah Instalasi
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+1. **Clone Repository**
+   ```bash
+   git clone https://github.com/ReXooGen/presensi_pkl_wfh.git
+   cd presensi_pkl_wfh
+   ```
 
-## Contributing
+2. **Install Dependencies**
+   ```bash
+   composer install
+   npm install
+   ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+3. **Konfigurasi Environment**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-## Code of Conduct
+4. **Setup Database**
+   ```bash
+   # Edit .env file dengan konfigurasi database
+   php artisan migrate
+   php artisan db:seed
+   ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+5. **Konfigurasi Google OAuth**
+   ```bash
+   # Tambahkan di .env file:
+   GOOGLE_CLIENT_ID=your_google_client_id
+   GOOGLE_CLIENT_SECRET=your_google_client_secret
+   GOOGLE_REDIRECT_URL=http://localhost:8000/auth/google/callback
+   ```
 
-## Security Vulnerabilities
+6. **Setup Storage**
+   ```bash
+   php artisan storage:link
+   ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+7. **Jalankan Aplikasi**
+   ```bash
+   php artisan serve
+   ```
 
-## License
+## 🚀 Penggunaan
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Untuk Siswa
+1. Akses aplikasi melalui browser
+2. Login menggunakan akun Google
+3. Isi form presensi sesuai jadwal (Pagi, Siang, Sore)
+4. Upload foto sebagai bukti presensi
+5. Lihat riwayat presensi pribadi
+
+### Untuk Admin
+1. Login dengan kredensial admin
+2. Akses dashboard admin
+3. Monitor data presensi seluruh siswa
+4. Filter dan export data ke Excel
+5. Kelola pengaturaan sistem
+
+## 📱 Jadwal Presensi
+
+- **Pagi**: 10.00 WIB (window: 09:30 - 10:30)
+- **Siang**: 14.00 WIB (window: 13:30 - 14:30)
+- **Sore**: 16.30 WIB (window: 16:00 - 17:00)
+
+## 🔧 Konfigurasi Production
+
+### Optimasi Memory untuk Export
+- Simple Export: < 100 records
+- Clean Export: 100-500 records  
+- Lightweight Export: > 500 records
+
+### Security Features
+- CSRF Protection
+- Input Validation
+- File Upload Security
+- User Data Isolation
+
+## 📁 Struktur Project
+
+```
+├── app/
+│   ├── Http/Controllers/     # Controller files
+│   ├── Models/              # Eloquent models
+│   ├── Exports/             # Excel export classes
+│   └── Jobs/                # Background jobs
+├── database/
+│   ├── migrations/          # Database migrations
+│   └── seeders/            # Data seeders
+├── resources/
+│   ├── views/              # Blade templates
+│   │   ├── absensi/        # Attendance views
+│   │   ├── admin/          # Admin dashboard
+│   │   └── auth/           # Authentication views
+│   └── css/                # Stylesheets
+└── storage/
+    ├── app/public/         # Public file storage
+    └── exports/            # Temporary export files
+```
+
+## 🤝 Kontribusi
+
+Kami menerima kontribusi dari komunitas. Silakan:
+
+1. Fork repository ini
+2. Buat branch untuk fitur baru (`git checkout -b feature/fitur-baru`)
+3. Commit perubahan (`git commit -am 'Tambah fitur baru'`)
+4. Push ke branch (`git push origin feature/fitur-baru`)
+5. Buat Pull Request
+
+## 📞 Kontak & Support
+
+- **Sekolah**: SMKN 1 Surabaya
+- **Developer**: ReXooGen
+- **Repository**: https://github.com/ReXooGen/presensi_pkl_wfh
+
+## 📄 Lisensi
+
+Sistem ini dikembangkan untuk SMKN 1 Surabaya. Built with Laravel Framework yang berlisensi [MIT](https://opensource.org/licenses/MIT).

@@ -10,6 +10,8 @@ class Absensi extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
+        'user_email',
         'konsentrasi_keahlian',
         'nama_murid',
         'kelas',
@@ -19,6 +21,17 @@ class Absensi extends Model
         'nama_pembimbing_dudika',
         'sesi_presensi',
         'presensi_at',
+        'presensi_date',
         'foto_path',
     ];
+
+    protected $casts = [
+        'presensi_at' => 'datetime',
+        'presensi_date' => 'date',
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

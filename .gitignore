@@ -1,24 +1,108 @@
+# Laravel
 *.log
-.DS_Store
 .env
 .env.backup
 .env.production
+.env.local
+.env.testing
 .phpactor.json
 .phpunit.result.cache
-/.fleet
-/.idea
-/.nova
-/.phpunit.cache
-/.vscode
-/.zed
 /auth.json
+/vendor
 /node_modules
 /public/build
 /public/hot
 /public/storage
 /storage/*.key
 /storage/pail
-/vendor
+/bootstrap/cache/*
+!/bootstrap/cache/.gitkeep
+/storage/app/*
+!/storage/app/.gitkeep
+!/storage/app/public
+!/storage/app/public/.gitkeep
+/storage/framework/cache/*
+!/storage/framework/cache/.gitkeep
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitkeep
+/storage/framework/testing/*
+!/storage/framework/testing/.gitkeep
+/storage/framework/views/*
+!/storage/framework/views/.gitkeep
+/storage/logs/*
+!/storage/logs/.gitkeep
+
+# IDE
+/.fleet
+/.idea
+/.nova
+/.phpunit.cache
+/.vscode
+/.zed
+
+# System files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Laravel specific
 Homestead.json
 Homestead.yaml
-Thumbs.db
+npm-debug.log
+yarn-error.log
+
+# Database
+*.sqlite
+*.sqlite3
+database/*.sqlite
+database/*.sqlite3
+
+# Uploads & User Generated Content
+/public/storage/absensi_foto/*
+!/public/storage/absensi_foto/.gitkeep
+/public/uploads/*
+!/public/uploads/.gitkeep
+
+# Temporary files
+*.tmp
+*.temp
+*.cache
+
+# Composer
+composer.phar
+composer.lock.bak
+
+# NPM/Yarn
+.npm
+.yarn
+.pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+/coverage
+/.nyc_output
+/phpunit.xml
+/phpunit.xml.dist
+
+# Documentation
+/docs/build
+
+# Local configuration
+/config/local.php
+/config/database.local.php
+
+# Deployment
+deploy.sh
+.deployer.phar
+.htaccess.bak
+
+# Excel exports (temporary files)
+/storage/exports/*
+!/storage/exports/.gitkeep
+
+# Google Sheets credentials (if any)
+google_credentials.json
+service-account-key.json

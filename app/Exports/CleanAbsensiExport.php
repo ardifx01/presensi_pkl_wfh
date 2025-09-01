@@ -8,8 +8,12 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
+use Maatwebsite\Excel\Concerns\WithStyles;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 
-class AbsensiExport implements FromQuery, WithHeadings, WithMapping, WithChunkReading, WithColumnWidths
+class CleanAbsensiExport implements FromQuery, WithHeadings, WithMapping, WithChunkReading, WithColumnWidths, WithStyles
 {
     protected $filters;
 
@@ -39,7 +43,6 @@ class AbsensiExport implements FromQuery, WithHeadings, WithMapping, WithChunkRe
         }
         
         return $query->select([
-            'id',
             'presensi_date',
             'presensi_at', 
             'sesi_presensi',
@@ -51,7 +54,8 @@ class AbsensiExport implements FromQuery, WithHeadings, WithMapping, WithChunkRe
             'nama_pembimbing_sekolah',
             'nama_pembimbing_dudika',
             'user_email'
-        ])->latest('presensi_at');
+        ])->orderBy('presensi_date', 'desc')
+          ->orderBy('presensi_at', 'desc');
     }
 
     public function headings(): array
@@ -95,24 +99,64 @@ class AbsensiExport implements FromQuery, WithHeadings, WithMapping, WithChunkRe
 
     public function chunkSize(): int
     {
-        return 1000; // Process data in chunks of 1000 records
+        return 500;
     }
 
     public function columnWidths(): array
     {
         return [
-            'A' => 5,   // No
-            'B' => 15,  // Tanggal
-            'C' => 12,  // Waktu
-            'D' => 20,  // Sesi
+            'A' => 8,   // No
+            'B' => 18,  // Tanggal
+            'C' => 15,  // Waktu
+            'D' => 25,  // Sesi
             'E' => 25,  // Nama Siswa
             'F' => 12,  // Kelas
-            'G' => 20,  // Konsentrasi
+            'G' => 25,  // Konsentrasi
             'H' => 30,  // Perusahaan
             'I' => 35,  // Alamat
             'J' => 25,  // Pembimbing Sekolah
             'K' => 25,  // Pembimbing DUDIKA
             'L' => 30,  // Email
+        ];
+    }
+
+    public function styles(Worksheet $sheet)
+    {
+        return [
+            // Header row styling
+            1 => [
+                'font' => [
+                    'bold' => true,
+                    'size' => 11,
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical' => Alignment::VERTICAL_CENTER,
+                ],
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                    ],
+                ],
+            ],
+            // All data cells
+            'A:L' => [
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                    ],
+                ],
+                'alignment' => [
+                    'vertical' => Alignment::VERTICAL_CENTER,
+                    'wrapText' => true,
+                ],
+            ],
+            // Center align for specific columns
+            'A:D' => [
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                ],
+            ],
         ];
     }
 }

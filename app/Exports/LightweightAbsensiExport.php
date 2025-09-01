@@ -7,9 +7,8 @@ use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
-use Maatwebsite\Excel\Concerns\WithColumnWidths;
 
-class AbsensiExport implements FromQuery, WithHeadings, WithMapping, WithChunkReading, WithColumnWidths
+class LightweightAbsensiExport implements FromQuery, WithHeadings, WithMapping, WithChunkReading
 {
     protected $filters;
 
@@ -38,8 +37,8 @@ class AbsensiExport implements FromQuery, WithHeadings, WithMapping, WithChunkRe
             $query->where('konsentrasi_keahlian', $this->filters['konsentrasi']);
         }
         
+        // Limit hasil untuk mencegah memory overflow
         return $query->select([
-            'id',
             'presensi_date',
             'presensi_at', 
             'sesi_presensi',
@@ -47,28 +46,26 @@ class AbsensiExport implements FromQuery, WithHeadings, WithMapping, WithChunkRe
             'kelas',
             'konsentrasi_keahlian',
             'nama_perusahaan',
-            'alamat_perusahaan',
             'nama_pembimbing_sekolah',
-            'nama_pembimbing_dudika',
-            'user_email'
-        ])->latest('presensi_at');
+            'nama_pembimbing_dudika'
+        ])->orderBy('presensi_date', 'desc')
+          ->orderBy('presensi_at', 'desc')
+          ->limit(1000); // Batasi maksimal 1000 record
     }
 
     public function headings(): array
     {
         return [
             'No',
-            'Tanggal Presensi', 
-            'Waktu Presensi',
-            'Sesi Presensi',
+            'Tanggal', 
+            'Waktu',
+            'Sesi',
             'Nama Siswa', 
             'Kelas', 
-            'Konsentrasi Keahlian',
-            'Nama Perusahaan', 
-            'Alamat Perusahaan', 
+            'Konsentrasi',
+            'Perusahaan', 
             'Pembimbing Sekolah', 
-            'Pembimbing DUDIKA',
-            'Email Siswa'
+            'Pembimbing DUDIKA'
         ];
     }
 
@@ -86,33 +83,13 @@ class AbsensiExport implements FromQuery, WithHeadings, WithMapping, WithChunkRe
             $row->kelas,
             $row->konsentrasi_keahlian,
             $row->nama_perusahaan,
-            $row->alamat_perusahaan,
             $row->nama_pembimbing_sekolah,
             $row->nama_pembimbing_dudika,
-            $row->user_email,
         ];
     }
 
     public function chunkSize(): int
     {
-        return 1000; // Process data in chunks of 1000 records
-    }
-
-    public function columnWidths(): array
-    {
-        return [
-            'A' => 5,   // No
-            'B' => 15,  // Tanggal
-            'C' => 12,  // Waktu
-            'D' => 20,  // Sesi
-            'E' => 25,  // Nama Siswa
-            'F' => 12,  // Kelas
-            'G' => 20,  // Konsentrasi
-            'H' => 30,  // Perusahaan
-            'I' => 35,  // Alamat
-            'J' => 25,  // Pembimbing Sekolah
-            'K' => 25,  // Pembimbing DUDIKA
-            'L' => 30,  // Email
-        ];
+        return 100; // Chunk size yang sangat kecil
     }
 }

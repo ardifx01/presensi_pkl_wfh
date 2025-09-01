@@ -8,11 +8,22 @@
 </head>
 <body class="bg-light">
 <div class="container py-4">
-    <h3 class="mb-3">Data Presensi PKL</h3>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0">Data Presensi PKL Saya</h3>
+        <small class="text-muted">{{ auth()->user()->email }}</small>
+    </div>
+    
     <div class="d-flex gap-2 mb-3">
         <a href="{{ route('absensi.create') }}" class="btn btn-sm btn-secondary">Kembali ke Form</a>
         <a href="{{ route('absensi.export') }}" class="btn btn-sm btn-success">Export Excel</a>
     </div>
+    
+    @if($data->total() > 0)
+        <div class="alert alert-info py-2">
+            <small>Menampilkan {{ $data->firstItem() }} - {{ $data->lastItem() }} dari {{ $data->total() }} data presensi Anda</small>
+        </div>
+    @endif
+    
     <div class="table-responsive">
         <table class="table table-bordered table-striped table-sm align-middle">
             <thead class="table-dark">
@@ -44,12 +55,13 @@
                     </td>
                 </tr>
             @empty
-                <tr><td colspan="8" class="text-center">Belum ada data</td></tr>
+                <tr><td colspan="8" class="text-center">Belum ada data presensi untuk akun Anda</td></tr>
             @endforelse
             </tbody>
         </table>
     </div>
-    {{ $data->links() }}
+    
+    {{ $data->links('custom.pagination') }}
 </div>
 </body>
 </html>
