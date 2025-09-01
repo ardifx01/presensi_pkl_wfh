@@ -2,7 +2,7 @@
 ### SMKN 1 Surabaya
 
 <p align="center">
-  ![SMKN1 SURABAYA](public/smk-negeri-1sby.png)
+  ![SMKN1 SURABAYA](public/images/smk-negeri-1sby.png)
 </p>
 
 <p align="center">
