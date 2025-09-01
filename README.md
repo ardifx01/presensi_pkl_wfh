@@ -2,7 +2,7 @@
 ### SMKN 1 Surabaya
 
 <p align="center">
-  <img src="public/images/logo-smkn1-sby.png" alt="SMKN 1 Surabaya Logo" width="150" height="150" style="object-fit: contain;">
+  <img src="![SMKN1 SURABAYA](public/smk-negeri-1sby.png)" alt="SMKN 1 Surabaya Logo" width="150" height="150" style="object-fit: contain;">
 </p>
 
 <p align="center">
