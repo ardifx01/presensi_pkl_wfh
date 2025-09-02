@@ -168,15 +168,15 @@
                     <label class="form-label">Konsentrasi Keahlian</label>
                     <select name="konsentrasi" class="form-select">
                         <option value="">Semua Konsentrasi</option>
-                        <option value="Rekayasa Perangkat Lunak" @selected(request('konsentrasi')=='Rekayasa Perangkat Lunak')>Rekayasa Perangkat Lunak</option>
-                        <option value="Teknik Komputer dan Jaringan" @selected(request('konsentrasi')=='Teknik Komputer dan Jaringan')>Teknik Komputer dan Jaringan</option>
-                        <option value="Multimedia" @selected(request('konsentrasi')=='Multimedia')>Multimedia</option>
-                        <option value="Teknik Kendaraan Ringan Otomotif" @selected(request('konsentrasi')=='Teknik Kendaraan Ringan Otomotif')>Teknik Kendaraan Ringan Otomotif</option>
-                        <option value="Teknik dan Bisnis Sepeda Motor" @selected(request('konsentrasi')=='Teknik dan Bisnis Sepeda Motor')>Teknik dan Bisnis Sepeda Motor</option>
-                        <option value="Teknik Bodi Otomotif" @selected(request('konsentrasi')=='Teknik Bodi Otomotif')>Teknik Bodi Otomotif</option>
-                        <option value="Teknik Permesinan" @selected(request('konsentrasi')=='Teknik Permesinan')>Teknik Permesinan</option>
-                        <option value="Teknik Pengelasan" @selected(request('konsentrasi')=='Teknik Pengelasan')>Teknik Pengelasan</option>
-                        <option value="Teknik Gambar Bangunan" @selected(request('konsentrasi')=='Teknik Gambar Bangunan')>Teknik Gambar Bangunan</option>
+                        <option value="REKAYASA PERANGKAT LUNAK" @selected(request('konsentrasi')=='REKAYASA PERANGKAT LUNAK')>REKAYASA PERANGKAT LUNAK</option>
+                        <option value="TEKNIK KOMPUTER DAN JARINGAN" @selected(request('konsentrasi')=='TEKNIK KOMPUTER DAN JARINGAN')>TEKNIK KOMPUTER DAN JARINGAN</option>
+                        <option value="BISNIS DIGITAL" @selected(request('konsentrasi')=='BISNIS DIGITAL')>BISNIS DIGITAL</option>
+                        <option value="MANAJEMEN PERKANTORAN" @selected(request('konsentrasi')=='MANAJEMEN PERKANTORAN')>MANAJEMEN PERKANTORAN</option>
+                        <option value="MANAJEMEN LOGISTIK" @selected(request('konsentrasi')=='MANAJEMEN LOGISTIK')>MANAJEMEN LOGISTIK</option>
+                        <option value="AKUNTANSI" @selected(request('konsentrasi')=='AKUNTANSI')>AKUNTANSI</option>
+                        <option value="PERHOTELAN" @selected(request('konsentrasi')=='PERHOTELAN')>PERHOTELAN</option>
+                        <option value="DESAIN KOMUNIKASI VISUAL" @selected(request('konsentrasi')=='DESAIN KOMUNIKASI VISUAL')>DESAIN KOMUNIKASI VISUAL</option>
+                        <option value="PRODUKSI DAN SIARAN PROGRAM TELEVISI" @selected(request('konsentrasi')=='PRODUKSI DAN SIARAN PROGRAM TELEVISI')>PRODUKSI DAN SIARAN PROGRAM TELEVISI</option>
                     </select>
                 </div>
                 <div class="col-md-4">

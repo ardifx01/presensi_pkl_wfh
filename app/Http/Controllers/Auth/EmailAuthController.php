@@ -37,7 +37,7 @@ class EmailAuthController extends Controller
                 $elapsed = now()->diffInSeconds($last);
                 if ($elapsed < $this->cooldownSeconds) {
                     $wait = $this->cooldownSeconds - $elapsed;
-                    return back()->with('status', "⏱️ Link baru saja dikirim! Tunggu {$wait} detik atau <a href='?force=1' class='alert-link'>kirim ulang paksa</a>.");
+                    return back()->with('status', "⏱️ Link baru saja dikirim! Tunggu {$wait} detik atau gunakan tombol 'Kirim Paksa' di bawah.");
                 }
             }
         }
@@ -62,10 +62,11 @@ class EmailAuthController extends Controller
             if (in_array($driver, ['log','array'])) {
                 return back()->with('status','📋 MODE '.$driver.' → Email hanya dicatat di log, tidak dikirim ke inbox. Aktifkan SMTP untuk pengiriman nyata.');
             }
-            $successMsg = '✅ Link login berhasil dikirim ke '.$email.'! Cek inbox dalam 1-2 menit.';
+            $successMsg = '✅ Link login berhasil dikirim ke '.$email.'!';
             if ($forceBypass) {
-                $successMsg .= ' (Bypass cooldown)';
+                $successMsg .= ' (bypass cooldown)';
             }
+            $successMsg .= ' Cek inbox atau folder Spam dalam 1-2 menit.';
             return back()->with('status', $successMsg);
         } catch (\Throwable $e) {
             \Log::error('Failed to send login email', [

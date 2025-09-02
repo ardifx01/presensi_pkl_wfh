@@ -221,11 +221,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     emailForm.addEventListener('submit', function(e) {
         setLoading(emailBtn, true);
-        showNotification('Mengirim link login...', 'info', 2000);
+        showNotification('📤 Mengirim link login ke email...', 'info', 3000);
     });
     
     adminForm.addEventListener('submit', function(e) {
         setLoading(adminBtn, true);
+        showNotification('🔐 Memverifikasi admin...', 'info', 2000);
     });
     
     // Email validation feedback
@@ -244,7 +245,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const email = document.getElementById('emailInput').value;
         
         if (!email) {
-            showNotification('Masukkan email dulu!', 'warning');
+            showNotification('⚠️ Masukkan alamat email terlebih dahulu!', 'warning');
+            return;
+        }
+        
+        if (!email.includes('@')) {
+            showNotification('⚠️ Format email tidak valid!', 'warning');
             return;
         }
         
@@ -271,7 +277,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.appendChild(forceForm);
         
         setLoading(document.querySelector('.btn-outline-warning'), true);
-        showNotification('Kirim paksa...', 'info', 2000);
+        showNotification('⚡ Mengirim paksa ke ' + email + '...', 'warning', 3000);
         
         forceForm.submit();
     };
