@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Presensi PKL</title>
+    <link rel="icon" type="image/png" href="images/smk-negeri-1sby.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .navbar-admin {
@@ -18,7 +19,7 @@
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
         }
         .navbar-admin img[alt] {
-            background-color: rgba(255,255,255,0.1);
+            
             border-radius: 8px;
             padding: 8px;
         }
@@ -121,6 +122,13 @@
         <div class="container-fluid">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
+                    @if(file_exists(public_path('images/smk-negeri-1sby.png')))
+                        <img src="{{ asset('images/smk-negeri-1sby.png') }}" alt="Logo SMKN 1 Surabaya" style="width: 60px; height: 60px; object-fit: contain;" class="me-3">
+                    @else
+                        <div class="d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.3); border-radius: 8px; font-size: 10px; font-weight: bold; color: white; text-align: center;">
+                            SMK<br>NEGERI<br>1 SBY
+                        </div>
+                    @endif
                     <div>
                         <h3 class="mb-1 text-white">Dashboard Admin Presensi PKL</h3>
                         <p class="mb-0 text-white-50">Kelola data presensi siswa PKL SMKN 1 Surabaya</p>

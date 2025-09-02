@@ -3,12 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Evaluasi Tengah Semester Murid PKL</title>
+    <title>Presensi PKL SMKN 1 SURABAYA</title>
+    <link rel="icon" type="image/png" href="images/smk-negeri-1sby.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
 <div class="container py-4">
-    <h2 class="mb-2">Evaluasi Tengah Semester Murid PKL</h2>
+    <div class="d-flex align-items-center mb-3">
+        @if(file_exists(public_path('images/smk-negeri-1sby.png')))
+            <img src="{{ asset('images/smk-negeri-1sby.png') }}" alt="Logo SMKN 1 Surabaya" style="width: 60px; height: 60px; object-fit: contain;" class="me-3">
+        @else
+            <div class="d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px; background: linear-gradient(135deg, #FFD700, #FFA500); border: 3px solid #8B4513; border-radius: 8px; font-size: 10px; font-weight: bold; color: #8B4513; text-align: center;">
+                SMK<br>NEGERI<br>1 SBY
+            </div>
+        @endif
+        <div>
+            <h2 class="mb-0">Presensi PKL SMKN 1 SURABAYA</h2>
+            <small class="text-muted">Sistem Presensi Praktek Kerja Lapangan</small>
+        </div>
+    </div>
     @auth
         <div class="alert alert-secondary d-flex justify-content-between align-items-center py-2 small mb-2">
             <div>
@@ -28,10 +41,10 @@
     <p>Silahkan untuk Presensi selama WFH murid PKL Tahun 2025</p>
     <div class="alert alert-info small">
         <strong>Untuk Presensi dilakukan 3X yaitu</strong><br>
-        1. pk. 10.00 WIB (Pagi)<br>
-        2. pk. 14.00 WIB (Siang)<br>
-        3. pk. 16.30 WIB (Sore)<br>
-        <br>Foto menggunakan Timestamp sesuai dengan sesi tersebut ya
+        1. <strong>Presensi Pagi</strong> - pk. 09.00 s/d 12.00 WIB<br>
+        2. <strong>Presensi Siang</strong> - pk. 13.00 s/d 15.00 WIB<br>
+        3. <strong>Presensi Malam</strong> - pk. 16.30 s/d 23.59 WIB<br>
+        <br><strong>Penting:</strong> Foto menggunakan Timestamp sesuai dengan sesi dan rentang waktu yang ditentukan!
     </div>
 
     @if(session('success'))
@@ -97,7 +110,7 @@
             <label class="form-label">Sesi Presensi *</label>
             <select name="sesi_presensi" class="form-select" required>
                 <option value="">Pilih Sesi</option>
-                @foreach(['10.00 WIB (Pagi)','14.00 WIB (Siang)','16.30 WIB (Sore)'] as $s)
+                @foreach(['Pagi (09.00-12.00 WIB)','Siang (13.00-15.00 WIB)','Malam (16.30-23.59 WIB)'] as $s)
                     <option value="{{ $s }}" @selected(old('sesi_presensi')==$s)>{{ $s }}</option>
                 @endforeach
             </select>

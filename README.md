@@ -115,9 +115,9 @@ Sistem Presensi PKL Work From Home adalah aplikasi web yang dikembangkan untuk m
 
 ## 📱 Jadwal Presensi
 
-- **Pagi**: 10.00 WIB (window: 09:30 - 10:30)
-- **Siang**: 14.00 WIB (window: 13:30 - 14:30)
-- **Sore**: 16.30 WIB (window: 16:00 - 17:00)
+- **Pagi**: 09.00 - 12.00 WIB (3 jam window)
+- **Siang**: 13.00 - 15.00 WIB (2 jam window)
+- **Malam**: 16.30 - 23.59 WIB (extended evening window)
 
 ## 🔧 Konfigurasi Production
 

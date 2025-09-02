@@ -30,19 +30,19 @@ class AbsensiController extends Controller
             'alamat_perusahaan' => 'required|string|max:255',
             'nama_pembimbing_sekolah' => 'required|string|max:150',
             'nama_pembimbing_dudika' => 'required|string|max:150',
-            'sesi_presensi' => 'required|in:10.00 WIB (Pagi),14.00 WIB (Siang),16.30 WIB (Sore)',
+            'sesi_presensi' => 'required|in:Pagi (09.00-12.00 WIB),Siang (13.00-15.00 WIB),Malam (16.30-23.59 WIB)',
             'foto_murid' => 'required|image|max:2048', // 2 MB (2048 KB)
         ], [
             'foto_murid.max' => 'Ukuran foto tidak boleh lebih dari 2 MB.',
             'foto_murid.image' => 'File harus berupa gambar yang valid.',
         ]);
 
-        // Validasi jam sesuai sesi (rentang toleransi 30 menit sebelum & sesudah)
+        // Validasi jam sesuai sesi dengan rentang waktu yang baru
         $now = now();
         $sessionWindows = [
-            '10.00 WIB (Pagi)' => ['start' => '09:30', 'end' => '10:30'],
-            '14.00 WIB (Siang)' => ['start' => '13:30', 'end' => '14:30'],
-            '16.30 WIB (Sore)' => ['start' => '16:00', 'end' => '17:00'],
+            'Pagi (09.00-12.00 WIB)' => ['start' => '09:00', 'end' => '12:00'],
+            'Siang (13.00-15.00 WIB)' => ['start' => '13:00', 'end' => '15:00'],
+            'Malam (16.30-23.59 WIB)' => ['start' => '16:30', 'end' => '23:59'],
         ];
         $window = $sessionWindows[$validated['sesi_presensi']];
         $start = $now->copy()->setTime(...explode(':', $window['start']));
