@@ -257,7 +257,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Buat form baru dengan parameter force
         const forceForm = document.createElement('form');
         forceForm.method = 'POST';
-        forceForm.action = '{{ route("login.email.send") }}?force=1';
+        forceForm.action = '{{ route("login.email.send") }}';
         forceForm.style.display = 'none';
         
         // Tambah CSRF token
@@ -273,6 +273,13 @@ document.addEventListener('DOMContentLoaded', function() {
         emailInput.name = 'email';
         emailInput.value = email;
         forceForm.appendChild(emailInput);
+        
+        // Tambah parameter force sebagai form data
+        const forceInput = document.createElement('input');
+        forceInput.type = 'hidden';
+        forceInput.name = 'force';
+        forceInput.value = '1';
+        forceForm.appendChild(forceInput);
         
         document.body.appendChild(forceForm);
         

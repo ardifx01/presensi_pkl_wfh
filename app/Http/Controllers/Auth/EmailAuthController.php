@@ -31,6 +31,17 @@ class EmailAuthController extends Controller
         // Bypass cooldown jika ada parameter 'force' atau user adalah admin
         $forceBypass = $request->has('force') || ($request->user() && $request->user()->is_admin);
         
+        // Debug logging untuk troubleshooting
+        \Log::info('Email auth request', [
+            'email' => $email,
+            'has_force' => $request->has('force'),
+            'force_value' => $request->get('force'),
+            'is_admin' => $request->user() ? $request->user()->is_admin : false,
+            'force_bypass' => $forceBypass,
+            'query_params' => $request->query(),
+            'all_params' => $request->all()
+        ]);
+        
         if (!$forceBypass) {
             $last = session('last_login_link_sent_at');
             if ($last) {
