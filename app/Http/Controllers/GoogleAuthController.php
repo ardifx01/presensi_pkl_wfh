@@ -6,6 +6,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\VerifyEmail;
 
 class GoogleAuthController extends Controller
 {
@@ -36,12 +38,20 @@ class GoogleAuthController extends Controller
                 'name' => $googleUser->getName(),
                 'google_id' => $googleUser->getId(),
                 'password' => bcrypt(str()->random(16)),
+                'email_verified_at' => now(), // Mark as verified since Google already verified the email
             ]
         );
 
+        // If this is a new user, send welcome email
+        if ($user->wasRecentlyCreated) {
+            $user->sendEmailVerificationNotification();
+            return redirect()->route('verification.notice')
+                ->with('status', 'Verification link has been sent to your email address.');
+        }
+
         Auth::login($user, true);
         
-        // Redirect berdasarkan status admin
+        // Redirect based on admin status
         if ($user->is_admin) {
             return redirect()->intended(route('admin.dashboard'));
         } else {
