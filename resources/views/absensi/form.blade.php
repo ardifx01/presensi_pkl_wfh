@@ -104,8 +104,9 @@
         </div>
         <div class="mb-3">
             <label class="form-label">Upload Foto Murid PKL (boleh selfi) dilengkapi dengan Timestamp * (format gambar)</label>
-            <input type="file" name="foto_murid" class="form-control" accept="image/*" required>
-            <small class="text-muted">Upload 1 file yang didukung: image. Maks 10 MB.</small>
+            <input type="file" name="foto_murid" class="form-control" accept="image/*" required id="foto_murid">
+            <small class="text-muted">Upload 1 file yang didukung: image. Maks 2 MB.</small>
+            <div class="invalid-feedback" id="file-error" style="display: none;"></div>
         </div>
         <div class="d-grid">
             <button class="btn btn-primary" type="submit">Kirim Presensi</button>
@@ -117,5 +118,27 @@
     <div class="small text-muted mt-2">User Support: <a href="mailto:humas@smkn1-sby.sch.id">humas@smkn1-sby.sch.id</a></div>
     </div>
 </div>
+
+<script>
+document.getElementById('foto_murid').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const errorDiv = document.getElementById('file-error');
+    const maxSize = 2 * 1024 * 1024; // 2 MB in bytes
+    
+    if (file) {
+        if (file.size > maxSize) {
+            errorDiv.textContent = 'Ukuran file terlalu besar! Maksimal 2 MB.';
+            errorDiv.style.display = 'block';
+            e.target.setCustomValidity('File terlalu besar');
+            e.target.classList.add('is-invalid');
+        } else {
+            errorDiv.textContent = '';
+            errorDiv.style.display = 'none';
+            e.target.setCustomValidity('');
+            e.target.classList.remove('is-invalid');
+        }
+    }
+});
+</script>
 </body>
 </html>

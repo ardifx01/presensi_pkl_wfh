@@ -31,7 +31,10 @@ class AbsensiController extends Controller
             'nama_pembimbing_sekolah' => 'required|string|max:150',
             'nama_pembimbing_dudika' => 'required|string|max:150',
             'sesi_presensi' => 'required|in:10.00 WIB (Pagi),14.00 WIB (Siang),16.30 WIB (Sore)',
-            'foto_murid' => 'required|image|max:10240', // 10MB
+            'foto_murid' => 'required|image|max:2048', // 2 MB (2048 KB)
+        ], [
+            'foto_murid.max' => 'Ukuran foto tidak boleh lebih dari 2 MB.',
+            'foto_murid.image' => 'File harus berupa gambar yang valid.',
         ]);
 
         // Validasi jam sesuai sesi (rentang toleransi 30 menit sebelum & sesudah)
