@@ -106,3 +106,19 @@ deploy.sh
 # Google Sheets credentials (if any)
 google_credentials.json
 service-account-key.json
+
+# Database Seeders (with sensitive data)
+/database/seeders/*UserSeeder.php
+/database/seeders/*AdminSeeder.php
+/database/seeders/ProductionSeeder.php
+/database/seeders/LocalSeeder.php
+!/database/seeders/DatabaseSeeder.php
+!/database/seeders/AbsensiSeeder.php
+
+# Seeder backup files
+/database/seeders/*.backup.php
+/database/seeders/*.bak.php
+
+# Migration backup files
+/database/migrations/*.backup.php
+/database/migrations/*.bak.php
