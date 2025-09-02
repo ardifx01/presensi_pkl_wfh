@@ -108,9 +108,9 @@
                             <a href="{{ route('login.reset.cooldown') }}" class="btn btn-sm btn-outline-secondary">
                                 <i class="fas fa-redo me-1"></i>Reset Cooldown
                             </a>
-                            <a href="{{ route('login.email.send') }}?force=1" onclick="event.preventDefault(); document.getElementById('emailForm').action='{{ route('login.email.send') }}?force=1'; document.getElementById('emailForm').submit();" class="btn btn-sm btn-outline-warning">
+                            <button type="button" onclick="sendForceEmail()" class="btn btn-sm btn-outline-warning">
                                 <i class="fas fa-bolt me-1"></i>Kirim Paksa
-                            </a>
+                            </button>
                         </div>
                     </form>
 
@@ -237,6 +237,44 @@ document.addEventListener('DOMContentLoaded', function() {
             this.classList.remove('is-invalid');
         }
     });
+    
+    // Function untuk kirim paksa
+    window.sendForceEmail = function() {
+        const form = document.getElementById('emailForm');
+        const email = document.getElementById('emailInput').value;
+        
+        if (!email) {
+            showNotification('Masukkan email dulu!', 'warning');
+            return;
+        }
+        
+        // Buat form baru dengan parameter force
+        const forceForm = document.createElement('form');
+        forceForm.method = 'POST';
+        forceForm.action = '{{ route("login.email.send") }}?force=1';
+        forceForm.style.display = 'none';
+        
+        // Tambah CSRF token
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = '{{ csrf_token() }}';
+        forceForm.appendChild(csrfInput);
+        
+        // Tambah email
+        const emailInput = document.createElement('input');
+        emailInput.type = 'hidden';
+        emailInput.name = 'email';
+        emailInput.value = email;
+        forceForm.appendChild(emailInput);
+        
+        document.body.appendChild(forceForm);
+        
+        setLoading(document.querySelector('.btn-outline-warning'), true);
+        showNotification('Kirim paksa...', 'info', 2000);
+        
+        forceForm.submit();
+    };
 });
 </script>
 </body>

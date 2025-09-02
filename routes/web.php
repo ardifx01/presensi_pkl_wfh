@@ -32,41 +32,6 @@ Route::middleware(['auth','admin'])->group(function() {
     Route::get('/admin', [DashboardController::class,'index'])->name('admin.dashboard');
 });
 
-// Debug mail route (only enable locally). Hit /debug/mail?to=someone@example.com
-if (config('app.env') !== 'production') {
-    Route::get('/debug/mail', function(\Illuminate\Http\Request $request) {
-        $to = $request->query('to');
-        if (!$to) {
-            return 'Tambahkan parameter ?to=email@domain';
-        }
-        try {
-            \Illuminate\Support\Facades\Mail::raw('Tes kirim email debug '.now(), function($m) use ($to) {
-                $m->to($to)->subject('Tes SMTP');
-            });
-            return 'Dikirim (cek Gmail inbox). Driver: '.config('mail.default');
-        } catch (\Throwable $e) {
-            return 'Gagal: '.$e->getMessage();
-        }
-    });
-    
-    // Test magic link creation and sending
-    Route::get('/debug/magic', function(\Illuminate\Http\Request $request) {
-        $email = $request->query('email', 'ajulian.fernando123@gmail.com');
-        try {
-            $raw = \Illuminate\Support\Str::random(40);
-            $hash = hash('sha256', $raw);
-            \App\Models\LoginToken::create([
-                'email' => $email,
-                'token_hash' => $hash,
-                'expires_at' => now()->addMinutes(15),
-            ]);
-            $baseUrl = $request->getSchemeAndHttpHost();
-            $loginUrl = $baseUrl.'/login/magic?email='.urlencode($email).'&token='.$raw;
-            \Illuminate\Support\Facades\Mail::to($email)->send(new \App\Mail\LoginLinkMail($loginUrl));
-            return 'Magic link dikirim ke '.$email.'. Cek Gmail! URL: '.$loginUrl;
-        } catch (\Throwable $e) {
-            return 'Error: '.$e->getMessage();
-        }
-    });
-}
+// Debug routes disabled in production for security
+// Enable only in local/staging environment if needed
 

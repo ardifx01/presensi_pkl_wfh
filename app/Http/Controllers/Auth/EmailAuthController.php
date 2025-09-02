@@ -49,9 +49,9 @@ class EmailAuthController extends Controller
             'token_hash' => $hash,
             'expires_at' => now()->addMinutes(15),
         ]);
-    // Bangun URL berbasis APP_URL; fallback ke host request jika masih localhost/127 agar email pakai domain benar
+    // Bangun URL berbasis APP_URL; tapi untuk local testing selalu pakai host request
     $baseUrl = rtrim(config('app.url') ?: url('/'), '/');
-    if (preg_match('/127\.0\.0\.1|localhost/i', $baseUrl)) {
+    if (config('app.env') === 'local' || preg_match('/127\.0\.0\.1|localhost/i', $baseUrl)) {
         $baseUrl = $request->getSchemeAndHttpHost();
     }
     $loginUrl = $baseUrl.'/login/magic?email='.urlencode($email).'&token='.$raw;
