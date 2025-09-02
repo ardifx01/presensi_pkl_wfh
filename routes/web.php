@@ -9,6 +9,7 @@ Route::get('/', fn() => redirect()->route('login'));
 
 // Auth routes (Google login + Admin login)
 Route::get('/login', [EmailAuthController::class,'show'])->name('login');
+Route::get('/login/link', fn() => redirect()->route('login'))->name('login.link'); // Redirect GET to login page
 Route::post('/admin/login', [EmailAuthController::class, 'adminLogin'])->name('admin.login');
 // Removed Google OAuth routes (migrated to passwordless email). If needed later, re-add here.
 Route::post('/login/link', [EmailAuthController::class,'send'])->name('login.email.send');

@@ -26,7 +26,7 @@
         <div class="alert alert-secondary d-flex justify-content-between align-items-center py-2 small mb-2">
             <div>
                 <strong>{{ auth()->user()->email }}</strong>
-                <span class="text-muted ms-2">| <a href="#" onclick="event.preventDefault();document.getElementById('logout-form').submit();">Ganti akun</a></span>
+                <span class="text-muted ms-2">| <a href="#" onclick="event.preventDefault();document.getElementById('logout-form').submit();">Logout</a></span>
             </div>
         </div>
         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
