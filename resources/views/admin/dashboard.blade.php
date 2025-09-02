@@ -202,7 +202,7 @@
             <div class="col-md-4">
                 <div class="stats-card">
                     <h6 class="mb-2">Total Presensi</h6>
-                    <h3 class="mb-0 text-primary">{{ $data->total() }}</h3>
+                    <h3 class="mb-0 text-primary">{{ $totalRecords }}</h3>
                 </div>
             </div>
             <div class="col-md-8">
@@ -211,14 +211,18 @@
                     @if($rekapPerSesi->count() > 0)
                         <div class="row">
                             @foreach($rekapPerSesi as $r)
-                                <div class="col-md-4">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span>{{ $r->sesi_presensi }}</span>
-                                        <strong>{{ $r->total }}</strong>
+                                <div class="col-md-4 mb-3">
+                                    <div class="small fw-semibold d-flex justify-content-between">
+                                        <span>{{ $r['label'] }}</span>
+                                        <span>{{ $r['total'] }} <span class="text-muted">({{ $r['percent'] }}%)</span></span>
+                                    </div>
+                                    <div class="progress" style="height:6px;">
+                                        <div class="progress-bar bg-primary" role="progressbar" style="width: {{ $r['percent'] }}%" aria-valuenow="{{ $r['percent'] }}" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                 </div>
                             @endforeach
                         </div>
+                        <div class="text-end small text-muted">Total: {{ $totalRecords }} presensi</div>
                     @else
                         <p class="text-muted mb-0">Belum ada data presensi</p>
                     @endif
