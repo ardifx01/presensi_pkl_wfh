@@ -75,6 +75,36 @@ class DashboardController extends Controller
             return array_search($item['label'], array_keys($canonicalSessions));
         })->values();
 
-        return view('admin.dashboard', compact('data','rekapPerSesi','totalRecords'));
+        // Rekap per kelas
+        $rekapPerKelas = (clone $q)
+            ->select('kelas')
+            ->selectRaw('count(*) as total')
+            ->groupBy('kelas')
+            ->orderBy('kelas')
+            ->get();
+
+        // Rekap per konsentrasi
+        $rekapPerKonsentrasi = (clone $q)
+            ->select('konsentrasi_keahlian')
+            ->selectRaw('count(*) as total')
+            ->groupBy('konsentrasi_keahlian')
+            ->orderBy('konsentrasi_keahlian')
+            ->get();
+
+        // Warna khusus per sesi
+        $sessionColors = [
+            'Pagi (09.00-12.00 WIB)'  => 'primary',
+            'Siang (13.00-15.00 WIB)' => 'warning',
+            'Malam (16.30-23.59 WIB)' => 'dark',
+        ];
+
+        return view('admin.dashboard', compact(
+            'data',
+            'rekapPerSesi',
+            'totalRecords',
+            'rekapPerKelas',
+            'rekapPerKonsentrasi',
+            'sessionColors'
+        ));
     }
 }

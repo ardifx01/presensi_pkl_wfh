@@ -211,13 +211,14 @@
                     @if($rekapPerSesi->count() > 0)
                         <div class="row">
                             @foreach($rekapPerSesi as $r)
+                                @php $color = $sessionColors[$r['label']] ?? 'secondary'; @endphp
                                 <div class="col-md-4 mb-3">
                                     <div class="small fw-semibold d-flex justify-content-between">
                                         <span>{{ $r['label'] }}</span>
                                         <span>{{ $r['total'] }} <span class="text-muted">({{ $r['percent'] }}%)</span></span>
                                     </div>
                                     <div class="progress" style="height:6px;">
-                                        <div class="progress-bar bg-primary" role="progressbar" style="width: {{ $r['percent'] }}%" aria-valuenow="{{ $r['percent'] }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="progress-bar bg-{{ $color }}" role="progressbar" style="width: {{ $r['percent'] }}%" aria-valuenow="{{ $r['percent'] }}" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                 </div>
                             @endforeach
@@ -225,6 +226,54 @@
                         <div class="text-end small text-muted">Total: {{ $totalRecords }} presensi</div>
                     @else
                         <p class="text-muted mb-0">Belum ada data presensi</p>
+                    @endif
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="stats-card h-100">
+                    <h6 class="mb-3">Rekap per Kelas</h6>
+                    @if(isset($rekapPerKelas) && $rekapPerKelas->count())
+                        <div class="row">
+                            @foreach($rekapPerKelas as $rk)
+                                @php $percent = $totalRecords ? round($rk->total / $totalRecords * 100,1) : 0; @endphp
+                                <div class="col-md-6 mb-3">
+                                    <div class="small d-flex justify-content-between">
+                                        <span>{{ $rk->kelas }}</span>
+                                        <span>{{ $rk->total }}</span>
+                                    </div>
+                                    <div class="progress" style="height:5px;">
+                                        <div class="progress-bar bg-info" style="width: {{ $percent }}%"></div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <p class="text-muted mb-0">Belum ada data</p>
+                    @endif
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="stats-card h-100">
+                    <h6 class="mb-3">Rekap per Konsentrasi</h6>
+                    @if(isset($rekapPerKonsentrasi) && $rekapPerKonsentrasi->count())
+                        <div class="row">
+                            @foreach($rekapPerKonsentrasi as $rk2)
+                                @php $percent2 = $totalRecords ? round($rk2->total / $totalRecords * 100,1) : 0; @endphp
+                                <div class="col-md-6 mb-3">
+                                    <div class="small d-flex justify-content-between">
+                                        <span>{{ \Illuminate\Support\Str::limit($rk2->konsentrasi_keahlian, 18) }}</span>
+                                        <span>{{ $rk2->total }}</span>
+                                    </div>
+                                    <div class="progress" style="height:5px;">
+                                        <div class="progress-bar bg-success" style="width: {{ $percent2 }}%"></div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <p class="text-muted mb-0">Belum ada data</p>
                     @endif
                 </div>
             </div>
