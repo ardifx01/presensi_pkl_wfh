@@ -13,29 +13,43 @@ return new class extends Migration {
             Schema::table('absensis', function (Blueprint $table) {
                 $table->date('presensi_date')->nullable()->after('presensi_at');
             });
+            
+            // Fill existing records with date from presensi_at
+            try {
+                $count = DB::table('absensis')->whereNull('presensi_date')->count();
+                if ($count > 0) {
+                    // Update in chunks to avoid memory issues
+                    DB::table('absensis')
+                        ->whereNull('presensi_date')
+                        ->chunkById(100, function ($records) {
+                            foreach ($records as $record) {
+                                DB::table('absensis')
+                                    ->where('id', $record->id)
+                                    ->update([
+                                        'presensi_date' => date('Y-m-d', strtotime($record->presensi_at))
+                                    ]);
+                            }
+                        });
+                }
+            } catch (Exception $e) {
+                // Fallback: set today's date if error
+                DB::table('absensis')
+                    ->whereNull('presensi_date')
+                    ->update(['presensi_date' => now()->toDateString()]);
+            }
         }
 
-        // Step 2: Fill existing records with date from presensi_at
-        try {
-            DB::table('absensis')
-                ->whereNull('presensi_date')
-                ->update(['presensi_date' => DB::raw('DATE(presensi_at)')]);
-        } catch (Exception $e) {
-            // Fallback: set today's date if error
-            DB::table('absensis')
-                ->whereNull('presensi_date')
-                ->update(['presensi_date' => now()->toDateString()]);
-        }
-
-        // Step 3: Add unique constraint (with error handling)
+        // Step 2: Add unique constraint (with error handling)
         try {
             // Check if index already exists
             $indexExists = false;
+            
+            // Try to check existing indexes
             try {
                 $indexes = DB::select("SHOW INDEX FROM absensis WHERE Key_name = 'absensi_unique_per_day'");
                 $indexExists = count($indexes) > 0;
             } catch (Exception $e) {
-                // SQLite or other DB - try alternative check
+                // For non-MySQL databases or if SHOW INDEX fails
                 $indexExists = false;
             }
 
@@ -46,7 +60,7 @@ return new class extends Migration {
             }
         } catch (Exception $e) {
             // Log error but don't fail migration
-            logger('Warning: Could not add unique constraint: ' . $e->getMessage());
+            logger('Warning: Could not add unique constraint to absensis table: ' . $e->getMessage());
         }
     }
 

@@ -14,6 +14,10 @@ class AbsensiSeeder extends Seeder
      */
     public function run(): void
     {
+        // Clear existing sample data first
+        Absensi::where('user_email', 'like', '%@student.smkn1sby.sch.id')->delete();
+        
+        echo "Creating sample attendance data for SMKN 1 Surabaya students...\n";
         // Data sample siswa SMKN 1 Surabaya
         $siswaData = [
             ['nama' => 'Ahmad Rizki', 'kelas' => '12 RPL 1'],
@@ -137,7 +141,6 @@ class AbsensiSeeder extends Seeder
                         'sesi_presensi' => $sesi,
                         'foto_path' => 'default/sample_photo.jpg', // dummy photo path
                         'presensi_at' => $waktuPresensi,
-                        'presensi_date' => $tanggal->toDateString(),
                         'user_email' => strtolower(str_replace(' ', '.', $siswa['nama'])) . '@student.smkn1sby.sch.id',
                         'created_at' => $waktuPresensi,
                         'updated_at' => $waktuPresensi,
