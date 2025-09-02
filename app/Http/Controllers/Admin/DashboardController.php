@@ -75,16 +75,44 @@ class DashboardController extends Controller
             return array_search($item['label'], array_keys($canonicalSessions));
         })->values();
 
-        // Rekap per kelas
-        $rekapPerKelas = (clone $q)
+        // Rekap per kelas - buat query baru untuk menghindari konflik ORDER BY dengan GROUP BY
+        $rekapPerKelasQuery = Absensi::query();
+        if ($request->filled('sesi')) {
+            $rekapPerKelasQuery->where('sesi_presensi', $request->sesi);
+        }
+        if ($request->filled('kelas')) {
+            $rekapPerKelasQuery->where('kelas', 'like', '%'.$request->kelas.'%');
+        }
+        if ($request->filled('tanggal')) {
+            $rekapPerKelasQuery->whereDate('presensi_date', $request->tanggal);
+        }
+        if ($request->filled('konsentrasi')) {
+            $rekapPerKelasQuery->where('konsentrasi_keahlian', $request->konsentrasi);
+        }
+        
+        $rekapPerKelas = $rekapPerKelasQuery
             ->select('kelas')
             ->selectRaw('count(*) as total')
             ->groupBy('kelas')
             ->orderBy('kelas')
             ->get();
 
-        // Rekap per konsentrasi
-        $rekapPerKonsentrasi = (clone $q)
+        // Rekap per konsentrasi - buat query baru untuk menghindari konflik ORDER BY dengan GROUP BY
+        $rekapPerKonsentrasiQuery = Absensi::query();
+        if ($request->filled('sesi')) {
+            $rekapPerKonsentrasiQuery->where('sesi_presensi', $request->sesi);
+        }
+        if ($request->filled('kelas')) {
+            $rekapPerKonsentrasiQuery->where('kelas', 'like', '%'.$request->kelas.'%');
+        }
+        if ($request->filled('tanggal')) {
+            $rekapPerKonsentrasiQuery->whereDate('presensi_date', $request->tanggal);
+        }
+        if ($request->filled('konsentrasi')) {
+            $rekapPerKonsentrasiQuery->where('konsentrasi_keahlian', $request->konsentrasi);
+        }
+        
+        $rekapPerKonsentrasi = $rekapPerKonsentrasiQuery
             ->select('konsentrasi_keahlian')
             ->selectRaw('count(*) as total')
             ->groupBy('konsentrasi_keahlian')
