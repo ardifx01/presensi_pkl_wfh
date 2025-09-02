@@ -56,13 +56,30 @@ class AbsensiController extends Controller
         $kelas = trim($validated['kelas']);
         $today = $now->toDateString();
 
-        $exists = Absensi::whereDate('presensi_date', $today)
-            ->where('sesi_presensi', $validated['sesi_presensi'])
-            ->whereRaw('LOWER(nama_murid)=?', [mb_strtolower($nama)])
-            ->whereRaw('LOWER(kelas)=?', [mb_strtolower($kelas)])
-            ->exists();
-        if ($exists) {
-            return back()->withErrors(['sesi_presensi' => 'Anda sudah melakukan presensi untuk sesi ini hari ini.'])->withInput();
+        // Cek duplikasi berdasarkan email dan sesi (lebih ketat)
+        $userEmail = auth()->check() ? auth()->user()->email : null;
+        
+        if ($userEmail) {
+            // Prioritas: Cek berdasarkan email user yang login
+            $exists = Absensi::whereDate('presensi_date', $today)
+                ->where('sesi_presensi', $validated['sesi_presensi'])
+                ->where('user_email', $userEmail)
+                ->exists();
+                
+            if ($exists) {
+                return back()->withErrors(['sesi_presensi' => 'Anda sudah melakukan presensi untuk sesi ini hari ini. Tidak bisa absen lagi di sesi yang sama.'])->withInput();
+            }
+        } else {
+            // Fallback: Cek berdasarkan nama dan kelas (untuk user yang tidak login)
+            $exists = Absensi::whereDate('presensi_date', $today)
+                ->where('sesi_presensi', $validated['sesi_presensi'])
+                ->whereRaw('LOWER(nama_murid)=?', [mb_strtolower($nama)])
+                ->whereRaw('LOWER(kelas)=?', [mb_strtolower($kelas)])
+                ->exists();
+                
+            if ($exists) {
+                return back()->withErrors(['sesi_presensi' => 'Siswa dengan nama dan kelas ini sudah melakukan presensi untuk sesi ini hari ini.'])->withInput();
+            }
         }
 
         // Simpan foto
