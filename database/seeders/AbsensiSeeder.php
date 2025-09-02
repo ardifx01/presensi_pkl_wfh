@@ -141,6 +141,7 @@ class AbsensiSeeder extends Seeder
                         'sesi_presensi' => $sesi,
                         'foto_path' => 'default/sample_photo.jpg', // dummy photo path
                         'presensi_at' => $waktuPresensi,
+                        'presensi_date' => $waktuPresensi->toDateString(), // Explicitly set presensi_date
                         'user_email' => strtolower(str_replace(' ', '.', $siswa['nama'])) . '@student.smkn1sby.sch.id',
                         'created_at' => $waktuPresensi,
                         'updated_at' => $waktuPresensi,
