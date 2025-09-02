@@ -8,6 +8,7 @@ use App\Models\LoginToken;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
@@ -32,7 +33,7 @@ class EmailAuthController extends Controller
         $forceBypass = $request->has('force') || ($request->user() && $request->user()->is_admin);
         
         // Debug logging untuk troubleshooting
-        \Log::info('Email auth request', [
+        Log::info('Email auth request', [
             'email' => $email,
             'has_force' => $request->has('force'),
             'force_value' => $request->get('force'),
@@ -80,7 +81,7 @@ class EmailAuthController extends Controller
             $successMsg .= ' Cek inbox atau folder Spam dalam 1-2 menit.';
             return back()->with('status', $successMsg);
         } catch (\Throwable $e) {
-            \Log::error('Failed to send login email', [
+            Log::error('Failed to send login email', [
                 'email' => $email,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
