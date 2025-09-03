@@ -12,25 +12,29 @@
 /node_modules
 /public/build
 /public/hot
-/public/storage
+# Storage directories are now included in git for easier deployment
+# /storage/*.key
+# /storage/pail
+# /bootstrap/cache/*
+# !/bootstrap/cache/.gitkeep
+# /storage/app/*
+# !/storage/app/.gitkeep
+# !/storage/app/public
+# !/storage/app/public/.gitkeep
+# /storage/framework/cache/*
+# !/storage/framework/cache/.gitkeep
+# /storage/framework/sessions/*
+# !/storage/framework/sessions/.gitkeep
+# /storage/framework/testing/*
+# !/storage/framework/testing/.gitkeep
+# /storage/framework/views/*
+# !/storage/framework/views/.gitkeep
+# /storage/logs/*
+# !/storage/logs/.gitkeep
+
+# Keep sensitive keys out of git
 /storage/*.key
 /storage/pail
-/bootstrap/cache/*
-!/bootstrap/cache/.gitkeep
-/storage/app/*
-!/storage/app/.gitkeep
-!/storage/app/public
-!/storage/app/public/.gitkeep
-/storage/framework/cache/*
-!/storage/framework/cache/.gitkeep
-/storage/framework/sessions/*
-!/storage/framework/sessions/.gitkeep
-/storage/framework/testing/*
-!/storage/framework/testing/.gitkeep
-/storage/framework/views/*
-!/storage/framework/views/.gitkeep
-/storage/logs/*
-!/storage/logs/.gitkeep
 
 # IDE
 /.fleet
