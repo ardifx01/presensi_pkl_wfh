@@ -139,9 +139,9 @@
             <label class="form-label">Sesi Presensi *</label>
             <div class="d-flex align-items-center mb-2">
                 <small class="text-muted me-2">Waktu sekarang:</small>
-                <span id="currentTime" class="badge bg-info"></span>
-                <small class="text-muted ms-2">|</small>
-                <span id="suggestedSession" class="badge ms-2"></span>
+                <span id="currentTime"></span>
+                <small class="text-muted ms-2">| </small>
+                <span id="suggestedSession" class="text-black"></span>
             </div>
             <select name="sesi_presensi" class="form-select" id="sesiSelect" required>
                 <option value="">Pilih Sesi</option>
@@ -233,12 +233,11 @@ function updateSuggestedSession(now) {
     
     if (!suggestedSession) {
         suggestedSession = '⚠️ Di luar jam sesi';
-        sessionColor = 'danger';
     }
     
     const suggestedElement = document.getElementById('suggestedSession');
     suggestedElement.textContent = suggestedSession;
-    suggestedElement.className = `badge bg-${sessionColor}`;
+    
 }
 
 // Session validation
