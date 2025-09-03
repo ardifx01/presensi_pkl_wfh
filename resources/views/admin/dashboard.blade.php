@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Admin Dashboard - Presensi PKL</title>
     <link rel="icon" type="image/png" href="images/smk-negeri-1sby.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         .navbar-admin {
             background-color: #0d6efd;
@@ -134,10 +136,28 @@
                         <p class="mb-0 text-white-50">Kelola data presensi siswa PKL SMKN 1 Surabaya</p>
                     </div>
                 </div>
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-inline">
-                    @csrf 
-                    <button class="btn btn-outline-light">Logout</button>
-                </form>
+                <div class="d-flex align-items-center gap-2">
+                    <!-- Maintenance Toggle Button -->
+                    <div class="btn-group me-3">
+                        @php
+                            $maintenanceActive = file_exists(storage_path('framework/maintenance'));
+                        @endphp
+                        @if($maintenanceActive)
+                            <button type="button" class="btn btn-warning btn-sm" onclick="toggleMaintenance('up')">
+                                <i class="fas fa-tools me-1"></i>Matikan Maintenance
+                            </button>
+                        @else
+                            <button type="button" class="btn btn-outline-light btn-sm" onclick="toggleMaintenance('down')">
+                                <i class="fas fa-tools me-1"></i>Aktifkan Maintenance
+                            </button>
+                        @endif
+                    </div>
+                    
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-inline">
+                        @csrf 
+                        <button class="btn btn-outline-light">Logout</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -370,5 +390,44 @@
             @endif
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleMaintenance(action) {
+            if (confirm(`Yakin ingin ${action === 'down' ? 'mengaktifkan' : 'menonaktifkan'} maintenance mode?`)) {
+                // Show loading
+                const button = event.target;
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Processing...';
+                button.disabled = true;
+                
+                fetch(`/admin/maintenance/${action}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || 
+                                       document.querySelector('input[name="_token"]')?.value
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        window.location.reload();
+                    } else {
+                        alert('Error: ' + (data.message || 'Gagal mengubah maintenance mode'));
+                        button.innerHTML = originalText;
+                        button.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Terjadi kesalahan saat mengubah maintenance mode');
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                });
+            }
+        }
+    </script>
 </body>
 </html>

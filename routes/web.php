@@ -4,6 +4,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\MaintenanceController;
+
+// Maintenance routes (always accessible)
+Route::get('/maintenance', [MaintenanceController::class, 'show'])->name('maintenance');
+Route::get('/api/maintenance/status', [MaintenanceController::class, 'checkStatus'])->name('maintenance.status');
 
 Route::get('/', fn() => redirect()->route('login'));
 
@@ -25,6 +30,7 @@ Route::middleware('auth')->group(function() {
 // Admin area - hanya untuk admin
 Route::middleware(['auth','admin'])->group(function() {
     Route::get('/admin', [DashboardController::class,'index'])->name('admin.dashboard');
+    Route::post('/admin/maintenance/{action}', [MaintenanceController::class, 'toggle'])->name('admin.maintenance.toggle');
 });
 
 // Debug routes disabled in production for security
