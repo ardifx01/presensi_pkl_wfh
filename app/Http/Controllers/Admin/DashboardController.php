@@ -162,6 +162,6 @@ class DashboardController extends Controller
             'rekapPerKelas',
             'rekapPerKonsentrasi',
             'sessionColors'
-        ));
+        ))->with('totalAllRecords', $totalRecords);
     }
 }
