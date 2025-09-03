@@ -100,9 +100,9 @@ class KelasNormalizer
         
         // Mapping sesi
         $canonicalSessions = [
-            '09.00-12.00' => ['pagi', '10.00', '09.00', 'morning'],
-            '13.00-15.00' => ['siang', '14.00', '13.00', 'afternoon'], 
-            '16.30-23.59' => ['malam', '16.30', 'sore', '17.00', 'evening', 'night']
+            'Pagi (09.00-12.00 WIB)' => ['pagi', '10.00', '09.00', 'morning'],
+            'Siang (13.00-15.00 WIB)' => ['siang', '14.00', '13.00', 'afternoon'], 
+            'Malam (16.30-23.59 WIB)' => ['malam', '16.30', 'sore', '17.00', 'evening', 'night']
         ];
 
         foreach ($canonicalSessions as $canonical => $variants) {
