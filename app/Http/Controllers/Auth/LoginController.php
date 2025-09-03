@@ -28,14 +28,22 @@ class LoginController extends Controller
             'password' => 'required|min:6'
         ]);
 
+        $isMaintenanceMode = file_exists(storage_path('framework/maintenance'));
+
+        // Jika maintenance aktif, hanya izinkan kredensial admin (is_admin = true)
+        if ($isMaintenanceMode) {
+            // Cek user dulu
+            $candidate = User::where('email', strtolower($request->input('email')))->first();
+            if (!$candidate || !$candidate->is_admin) {
+                return redirect()->route('maintenance')->with('info', 'Sistem maintenance. Hanya admin yang bisa login.');
+            }
+        }
+
         // Attempt login
         if (Auth::attempt($credentials, $request->filled('remember'))) {
             $request->session()->regenerate();
 
             $user = Auth::user();
-            
-            // Cek apakah maintenance mode aktif
-            $isMaintenanceMode = file_exists(storage_path('framework/maintenance'));
             
             // Redirect based on user role dan maintenance status
             if ($user->is_admin) {

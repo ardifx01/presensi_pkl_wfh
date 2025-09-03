@@ -157,15 +157,35 @@
         </div>
     </div>
 
-    <!-- Admin Login Button -->
-    <button class="admin-login-btn" onclick="adminLogin()">
+    <!-- Admin Login Floating Button -->
+    <button class="admin-login-btn" onclick="toggleAdminForm()">
         <i class="fas fa-user-shield me-1"></i>Admin Login
     </button>
 
+    <!-- Hidden Admin Login Form -->
+    <div id="adminLoginPanel" style="position:fixed; bottom:80px; right:20px; width:260px; background:rgba(255,255,255,0.95); border-radius:14px; box-shadow:0 8px 24px rgba(0,0,0,0.15); padding:1rem; display:none;">
+        <form method="POST" action="{{ route('maintenance.admin.login') }}" style="margin:0;">
+            @csrf
+            <div class="mb-2">
+                <input type="email" name="email" class="form-control form-control-sm" placeholder="Admin Email" required autofocus>
+            </div>
+            <div class="mb-2">
+                <input type="password" name="password" class="form-control form-control-sm" placeholder="Password" required>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+                <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-sign-in-alt me-1"></i>Masuk</button>
+                <button type="button" class="btn btn-link btn-sm text-decoration-none" onclick="toggleAdminForm()">Tutup</button>
+            </div>
+            @if($errors->any())
+                <div class="text-danger small mt-2">{{ $errors->first() }}</div>
+            @endif
+        </form>
+    </div>
+
     <script>
-        function adminLogin() {
-            // Redirect langsung ke login dengan force reload
-            window.location.href = '/login';
+        function toggleAdminForm() {
+            const panel = document.getElementById('adminLoginPanel');
+            panel.style.display = panel.style.display === 'none' || panel.style.display === '' ? 'block' : 'none';
         }
         
         // Auto refresh setiap 5 menit untuk cek apakah maintenance sudah selesai
@@ -188,7 +208,7 @@
                 });
         }
 
-        updateEstimatedTime();
+    updateEstimatedTime();
     </script>
 </body>
 </html>
