@@ -148,20 +148,12 @@ class DashboardController extends Controller
             $item->sesi_normalized = KelasNormalizer::normalizeSesi($item->sesi_presensi);
         }
 
-        // Warna khusus per sesi
-        $sessionColors = [
-            'Pagi (09.00-12.00 WIB)'  => 'primary',
-            'Siang (13.00-15.00 WIB)' => 'warning',
-            'Malam (16.30-23.59 WIB)' => 'dark',
-        ];
-
         return view('admin.dashboard', compact(
             'data',
             'rekapPerSesi',
             'totalRecords',
             'rekapPerKelas',
-            'rekapPerKonsentrasi',
-            'sessionColors'
+            'rekapPerKonsentrasi'
         ));
     }
 }

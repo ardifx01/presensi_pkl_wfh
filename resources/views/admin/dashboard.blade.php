@@ -324,9 +324,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <span class="badge bg-{{ $sessionColors[$row->sesi_normalized] ?? 'secondary' }}">
-                                        {{ $row->sesi_normalized ?? $row->sesi_presensi }}
-                                    </span>
+                                    {{ $row->sesi_normalized ?? $row->sesi_presensi }}
                                 </td>
                                 <td>{{ $row->nama_murid }}</td>
                                 <td>
