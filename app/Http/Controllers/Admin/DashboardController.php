@@ -56,9 +56,9 @@ class DashboardController extends Controller
         // Paginate data
         $data = $q->latest('presensi_at')->paginate(50)->withQueryString();
         
-        // REKAP GABUNGAN SEMUA DATA (tanpa filter, dari seluruh database)
-        $allRecords = Absensi::all();
-        $totalAllRecords = $allRecords->count();
+        // REKAP GABUNGAN SEMUA PAGE (bukan hanya current page)
+        $rekapQuery = clone $q;
+        $allRecords = $rekapQuery->get();
         
         // Normalisasi dan rekap per sesi untuk SEMUA data
         $canonicalSessions = [
@@ -90,14 +90,14 @@ class DashboardController extends Controller
             }
         }
 
-        // Susun rekap untuk view (dengan persentase berdasarkan SEMUA data)
+        // Susun rekap untuk view (dengan persentase)
         $rekapPerSesi = collect();
         foreach ($rekapMap as $label => $count) {
             if ($count === 0) continue; // sembunyikan yang kosong agar rapi
             $rekapPerSesi->push([
                 'label' => $label,
                 'total' => $count,
-                'percent' => $totalAllRecords > 0 ? round($count / $totalAllRecords * 100, 1) : 0
+                'percent' => $totalRecords > 0 ? round($count / $totalRecords * 100, 1) : 0
             ]);
         }
 
@@ -148,12 +148,20 @@ class DashboardController extends Controller
             $item->sesi_normalized = KelasNormalizer::normalizeSesi($item->sesi_presensi);
         }
 
+        // Warna khusus per sesi
+        $sessionColors = [
+            'Pagi (09.00-12.00 WIB)'  => 'primary',
+            'Siang (13.00-15.00 WIB)' => 'warning',
+            'Malam (16.30-23.59 WIB)' => 'dark',
+        ];
+
         return view('admin.dashboard', compact(
             'data',
             'rekapPerSesi',
-            'totalAllRecords',
+            'totalRecords',
             'rekapPerKelas',
-            'rekapPerKonsentrasi'
+            'rekapPerKonsentrasi',
+            'sessionColors'
         ));
     }
 }
