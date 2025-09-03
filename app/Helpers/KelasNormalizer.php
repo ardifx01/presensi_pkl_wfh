@@ -64,6 +64,13 @@ class KelasNormalizer
     {
         $jurusan = strtoupper($jurusan);
         
+        // Cek jika sudah merupakan singkatan
+        foreach (self::$konsentrasiMapping as $fullName => $shortName) {
+            if ($jurusan === $shortName) {
+                return $shortName; // Sudah benar, return as is
+            }
+        }
+        
         // Cek mapping langsung
         if (isset(self::$konsentrasiMapping[$jurusan])) {
             return self::$konsentrasiMapping[$jurusan];
@@ -76,7 +83,7 @@ class KelasNormalizer
             }
         }
         
-        // Jika tidak ketemu, return original
+        // Jika tidak ketemu, return original tapi uppercase
         return $jurusan;
     }
 
@@ -93,9 +100,9 @@ class KelasNormalizer
         
         // Mapping sesi
         $canonicalSessions = [
-            'Pagi (09.00-12.00 WIB)' => ['pagi', '10.00', '09.00', 'morning'],
-            'Siang (13.00-15.00 WIB)' => ['siang', '14.00', '13.00', 'afternoon'], 
-            'Malam (16.30-23.59 WIB)' => ['malam', '16.30', 'sore', '17.00', 'evening', 'night']
+            '09.00-12.00' => ['pagi', '10.00', '09.00', 'morning'],
+            '13.00-15.00' => ['siang', '14.00', '13.00', 'afternoon'], 
+            '16.30-23.59' => ['malam', '16.30', 'sore', '17.00', 'evening', 'night']
         ];
 
         foreach ($canonicalSessions as $canonical => $variants) {

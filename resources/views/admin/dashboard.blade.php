@@ -155,7 +155,7 @@
                     <label class="form-label">Sesi Presensi</label>
                     <select name="sesi" class="form-select">
                         <option value="">Semua Sesi</option>
-                        @foreach(['10.00 WIB (Pagi)','14.00 WIB (Siang)','16.30 WIB (Sore)'] as $s)
+                        @foreach(['09.00-12.00','13.00-15.00','16.30-23.59'] as $s)
                             <option value="{{ $s }}" @selected(request('sesi')==$s)>{{ $s }}</option>
                         @endforeach
                     </select>
@@ -324,9 +324,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <span class="badge bg-{{ $sessionColors[$row->sesi_normalized] ?? 'secondary' }}">
-                                        {{ $row->sesi_normalized ?? $row->sesi_presensi }}
-                                    </span>
+                                    {{ $row->sesi_normalized ?? $row->sesi_presensi }}
                                 </td>
                                 <td>{{ $row->nama_murid }}</td>
                                 <td>

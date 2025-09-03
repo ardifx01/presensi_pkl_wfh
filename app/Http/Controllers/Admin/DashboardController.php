@@ -24,9 +24,9 @@ class DashboardController extends Controller
             $q->where(function($query) use ($sesiFilter) {
                 // Cari berdasarkan nama canonical dan variants
                 $canonicalSessions = [
-                    'Pagi (09.00-12.00 WIB)' => ['pagi', '10.00', '09.00', 'morning'],
-                    'Siang (13.00-15.00 WIB)' => ['siang', '14.00', '13.00', 'afternoon'], 
-                    'Malam (16.30-23.59 WIB)' => ['malam', '16.30', 'sore', '17.00', 'evening', 'night']
+                    '09.00-12.00' => ['pagi', '10.00', '09.00', 'morning'],
+                    '13.00-15.00' => ['siang', '14.00', '13.00', 'afternoon'], 
+                    '16.30-23.59' => ['malam', '16.30', 'sore', '17.00', 'evening', 'night']
                 ];
                 
                 if (isset($canonicalSessions[$sesiFilter])) {
@@ -62,9 +62,9 @@ class DashboardController extends Controller
         
         // Normalisasi dan rekap per sesi untuk SEMUA data
         $canonicalSessions = [
-            'Pagi (09.00-12.00 WIB)' => ['pagi', '10.00', '09.00', 'morning'],
-            'Siang (13.00-15.00 WIB)' => ['siang', '14.00', '13.00', 'afternoon'],
-            'Malam (16.30-23.59 WIB)' => ['malam', '16.30', 'sore', '17.00', 'evening', 'night']
+            '09.00-12.00' => ['pagi', '10.00', '09.00', 'morning'],
+            '13.00-15.00' => ['siang', '14.00', '13.00', 'afternoon'],
+            '16.30-23.59' => ['malam', '16.30', 'sore', '17.00', 'evening', 'night']
         ];
 
         $rekapMap = [];
@@ -148,13 +148,7 @@ class DashboardController extends Controller
             $item->sesi_normalized = KelasNormalizer::normalizeSesi($item->sesi_presensi);
         }
 
-        // Warna khusus per sesi
-        $sessionColors = [
-            'Pagi (09.00-12.00 WIB)'  => 'primary',
-            'Siang (13.00-15.00 WIB)' => 'warning',
-            'Malam (16.30-23.59 WIB)' => 'dark',
-        ];
-
+        
         return view('admin.dashboard', compact(
             'data',
             'rekapPerSesi',
