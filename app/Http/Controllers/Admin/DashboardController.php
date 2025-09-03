@@ -56,9 +56,9 @@ class DashboardController extends Controller
         // Paginate data
         $data = $q->latest('presensi_at')->paginate(50)->withQueryString();
         
-        // REKAP GABUNGAN SEMUA PAGE (bukan hanya current page)
-        $rekapQuery = clone $q;
-        $allRecords = $rekapQuery->get();
+        // REKAP GABUNGAN SEMUA DATA (tanpa filter, dari seluruh database)
+        $allRecords = Absensi::all();
+        $totalAllRecords = $allRecords->count();
         
         // Normalisasi dan rekap per sesi untuk SEMUA data
         $canonicalSessions = [
@@ -90,14 +90,14 @@ class DashboardController extends Controller
             }
         }
 
-        // Susun rekap untuk view (dengan persentase)
+        // Susun rekap untuk view (dengan persentase berdasarkan SEMUA data)
         $rekapPerSesi = collect();
         foreach ($rekapMap as $label => $count) {
             if ($count === 0) continue; // sembunyikan yang kosong agar rapi
             $rekapPerSesi->push([
                 'label' => $label,
                 'total' => $count,
-                'percent' => $totalRecords > 0 ? round($count / $totalRecords * 100, 1) : 0
+                'percent' => $totalAllRecords > 0 ? round($count / $totalAllRecords * 100, 1) : 0
             ]);
         }
 
@@ -151,7 +151,7 @@ class DashboardController extends Controller
         return view('admin.dashboard', compact(
             'data',
             'rekapPerSesi',
-            'totalRecords',
+            'totalAllRecords',
             'rekapPerKelas',
             'rekapPerKonsentrasi'
         ));

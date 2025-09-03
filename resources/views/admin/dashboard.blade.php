@@ -202,7 +202,7 @@
             <div class="col-md-4">
                 <div class="stats-card">
                     <h6 class="mb-2">Total Presensi</h6>
-                    <h3 class="mb-0 text-primary">{{ $totalRecords }}</h3>
+                    <h3 class="mb-0 text-primary">{{ $totalAllRecords }}</h3>
                 </div>
             </div>
             <div class="col-md-8">
@@ -223,7 +223,7 @@
                                 </div>
                             @endforeach
                         </div>
-                        <div class="text-end small text-muted">Total: {{ $totalRecords }} presensi</div>
+                        <div class="text-end small text-muted">Total: {{ $totalAllRecords }} presensi</div>
                     @else
                         <p class="text-muted mb-0">Belum ada data presensi</p>
                     @endif
@@ -236,7 +236,7 @@
                     @if(isset($rekapPerKelas) && $rekapPerKelas->count())
                         <div class="row">
                             @foreach($rekapPerKelas as $rk)
-                                @php $percent = $totalRecords ? round($rk['total'] / $totalRecords * 100,1) : 0; @endphp
+                                @php $percent = $totalAllRecords ? round($rk['total'] / $totalAllRecords * 100,1) : 0; @endphp
                                 <div class="col-md-6 mb-3">
                                     <div class="small d-flex justify-content-between">
                                         <span>{{ $rk['kelas'] }}</span>
@@ -260,7 +260,7 @@
                     @if(isset($rekapPerKonsentrasi) && $rekapPerKonsentrasi->count())
                         <div class="row">
                             @foreach($rekapPerKonsentrasi as $rk2)
-                                @php $percent2 = $totalRecords ? round($rk2['total'] / $totalRecords * 100,1) : 0; @endphp
+                                @php $percent2 = $totalAllRecords ? round($rk2['total'] / $totalAllRecords * 100,1) : 0; @endphp
                                 <div class="col-md-6 mb-3">
                                     <div class="small d-flex justify-content-between">
                                         <span>{{ \Illuminate\Support\Str::limit($rk2['konsentrasi_keahlian'], 18) }}</span>
