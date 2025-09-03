@@ -44,6 +44,11 @@ class LoginController extends Controller
             $request->session()->regenerate();
 
             $user = Auth::user();
+
+            // Jika user wajib ganti password, arahkan langsung
+            if ($user->force_password_change) {
+                return redirect()->route('password.change.form');
+            }
             
             // Redirect based on user role dan maintenance status
             if ($user->is_admin) {

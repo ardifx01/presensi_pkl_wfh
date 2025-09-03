@@ -32,6 +32,9 @@
                 @if(auth()->user()->is_admin)
                     <span class="badge bg-warning ms-2">ADMIN</span>
                 @endif
+                <span class="text-muted ms-2">|
+                    <a href="{{ route('password.change.form') }}" class="text-decoration-none">Ganti Password</a>
+                </span>
                 <span class="text-muted ms-2">| <a href="#" onclick="event.preventDefault();document.getElementById('logout-form').submit();">Logout</a></span>
             </div>
         </div>

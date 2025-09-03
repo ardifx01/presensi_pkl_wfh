@@ -284,6 +284,20 @@
                         <i class="fas fa-user-plus me-2"></i>Belum punya akun? 
                         <a href="{{ route('register') }}"><strong>Daftar di sini</strong></a>
                     </p>
+                    @auth
+                        <p class="mb-1">
+                            <i class="fas fa-key me-2"></i>
+                            <a href="{{ route('password.change.form') }}" class="text-decoration-none">Ganti Password</a>
+                        </p>
+                    @else
+                        <p class="mb-1 small text-muted">
+                            <i class="fas fa-key me-1"></i> Setelah login pertama dengan password sementara, Anda akan diminta mengganti password.
+                        </p>
+                        <p class="mb-0 small">
+                            <i class="fas fa-unlock-alt me-1"></i>
+                            <a href="{{ route('password.self.form') }}" class="text-decoration-none">Ganti password sekarang</a>
+                        </p>
+                    @endauth
                     <small class="text-muted">
                         <i class="fas fa-graduation-cap me-1"></i>Siswa baru wajib mendaftar untuk menyimpan riwayat presensi
                     </small>
@@ -300,7 +314,7 @@
     document.getElementById('togglePassword').addEventListener('click', function() {
         const password = document.getElementById('password');
         const icon = document.getElementById('toggleIcon');
-        ff
+        
         if (password.type === 'password') {
             password.type = 'text';
             icon.classList.remove('fa-eye');

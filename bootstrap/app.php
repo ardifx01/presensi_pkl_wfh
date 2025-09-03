@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'maintenance.check' => \App\Http\Middleware\MaintenanceMode::class,
+            'force.password.change' => \App\Http\Middleware\ForcePasswordChange::class,
         ]);
         
         // Add timezone middleware globally

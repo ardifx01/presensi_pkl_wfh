@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Auth\PasswordChangeController;
 use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -35,7 +36,7 @@ Route::post('/register', [LoginController::class, 'register'])->name('register.p
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Protected routes - diblok saat maintenance untuk non-admin
-Route::middleware(['auth','maintenance.check'])->group(function() {
+Route::middleware(['auth','maintenance.check','force.password.change'])->group(function() {
     Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index');
     Route::get('/absensi/export', [AbsensiController::class, 'export'])->name('absensi.export');
     Route::get('/absensi/form', [AbsensiController::class, 'create'])->name('absensi.create');
@@ -43,9 +44,19 @@ Route::middleware(['auth','maintenance.check'])->group(function() {
 });
 
 // Admin area - hanya admin dashboard dan maintenance management yang diizinkan
-Route::middleware(['auth','admin'])->group(function() {
+Route::middleware(['auth','admin','force.password.change'])->group(function() {
     Route::get('/admin', [DashboardController::class,'index'])->name('admin.dashboard');
     Route::post('/admin/maintenance/{action}', [MaintenanceController::class, 'toggle'])->name('admin.maintenance.toggle');
+});
+
+// Force password change routes
+Route::middleware(['auth'])->group(function() {
+    Route::get('/password/change', [PasswordChangeController::class,'form'])->name('password.change.form');
+    Route::post('/password/change', [PasswordChangeController::class,'update'])->name('password.change.update');
+    
+    // Public self-service password change (dari halaman login)
+    Route::get('/password/self-service', [PasswordChangeController::class,'selfServiceForm'])->name('password.self.form');
+    Route::post('/password/self-service', [PasswordChangeController::class,'selfServiceUpdate'])->name('password.self.update');
 });
 
 // Debug routes disabled in production for security

@@ -165,7 +165,18 @@
     <div class="container-fluid px-4">
         <!-- Filter Section -->
         <div class="filter-section">
-            <h5 class="mb-3">Filter Data Presensi</h5>
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <h5 class="mb-0">Filter Data Presensi</h5>
+                @if(isset($isDaily) && $isDaily)
+                    <span class="badge bg-info text-dark" title="Menampilkan data presensi hari ini secara otomatis sampai Anda memilih tanggal.">
+                        Mode Harian Otomatis ({{ now()->format('d M Y') }})
+                    </span>
+                @elseif(request('tanggal'))
+                    <span class="badge bg-secondary" title="Data difilter berdasarkan tanggal yang dipilih.">
+                        Tanggal: {{ request('tanggal') }}
+                    </span>
+                @endif
+            </div>
             <form class="row g-3 align-items-end">
                 <div class="col-md-2">
                     <label class="form-label">Tanggal</label>

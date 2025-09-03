@@ -35,6 +35,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'google_id',
         'is_admin',
         'is_testing',
+    'temp_password',
+    'force_password_change',
     ];
 
     /**
@@ -58,6 +60,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_admin' => 'boolean',
+            'force_password_change' => 'boolean',
         ];
     }
 }

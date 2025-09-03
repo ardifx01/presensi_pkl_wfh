@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Absensi;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Helpers\KelasNormalizer;
 
@@ -17,6 +18,14 @@ class DashboardController extends Controller
         }
         
         $q = Absensi::query();
+
+        // Default: tampilkan hanya presensi HARI INI kecuali user memberi filter tanggal
+        $isDaily = false;
+        if (!$request->filled('tanggal')) {
+            $today = Carbon::today();
+            $q->whereDate('presensi_date', $today);
+            $isDaily = true;
+        }
         
         // Filter sesi dengan normalisasi
         if ($request->filled('sesi')) {
@@ -56,9 +65,8 @@ class DashboardController extends Controller
         // Paginate data
         $data = $q->latest('presensi_at')->paginate(50)->withQueryString();
         
-        // REKAP PER SESI DARI SEMUA DATA (TIDAK TERPENGARUH FILTER APAPUN)
-        // Ambil SEMUA data presensi untuk rekap sesi yang konsisten
-        $allPresence = Absensi::all();
+    // Ambil dataset untuk rekap (mengikuti default harian atau filter yang dipilih)
+    $allPresence = (clone $q)->get();
         $totalAllPresence = $allPresence->count();
         
         // Normalisasi dan rekap per sesi untuk SEMUA data
@@ -162,7 +170,8 @@ class DashboardController extends Controller
             'totalRecords',
             'rekapPerKelas',
             'rekapPerKonsentrasi',
-            'sessionColors'
+            'sessionColors',
+            'isDaily'
         ))->with('totalAllRecords', $totalAllPresence);
     }
 }
