@@ -131,6 +131,13 @@
                 Mohon maaf atas ketidaknyamanan yang terjadi.
             </p>
 
+            @if(session('info'))
+                <div class="alert alert-info border-0 rounded-3 mb-3" style="background: rgba(23, 162, 184, 0.1); color: #0c5460;">
+                    <i class="fas fa-info-circle me-2"></i>
+                    {{ session('info') }}
+                </div>
+            @endif
+
             <div class="progress">
                 <div class="progress-bar"></div>
             </div>
@@ -151,11 +158,16 @@
     </div>
 
     <!-- Admin Login Button -->
-    <a href="{{ route('login') }}" class="admin-login-btn">
+    <button class="admin-login-btn" onclick="adminLogin()">
         <i class="fas fa-user-shield me-1"></i>Admin Login
-    </a>
+    </button>
 
     <script>
+        function adminLogin() {
+            // Redirect langsung ke login dengan force reload
+            window.location.href = '/login';
+        }
+        
         // Auto refresh setiap 5 menit untuk cek apakah maintenance sudah selesai
         setTimeout(function() {
             window.location.reload();

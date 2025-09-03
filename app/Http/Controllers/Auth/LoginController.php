@@ -34,11 +34,19 @@ class LoginController extends Controller
 
             $user = Auth::user();
             
-            // Redirect based on user role
+            // Cek apakah maintenance mode aktif
+            $isMaintenanceMode = file_exists(storage_path('framework/maintenance'));
+            
+            // Redirect based on user role dan maintenance status
             if ($user->is_admin) {
                 return redirect()->intended('/admin')->with('success', 'Selamat datang, ' . $user->name);
             } else {
-                return redirect()->intended('/absensi/form')->with('success', 'Selamat datang, ' . $user->name);
+                // Jika maintenance mode aktif, redirect user biasa ke maintenance page
+                if ($isMaintenanceMode) {
+                    return redirect()->route('maintenance')->with('info', 'Sistem sedang dalam maintenance. Silakan coba lagi nanti.');
+                } else {
+                    return redirect()->intended('/absensi/form')->with('success', 'Selamat datang, ' . $user->name);
+                }
             }
         }
 

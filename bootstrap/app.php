@@ -19,9 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         
         // Add timezone middleware globally
         $middleware->append(\App\Http\Middleware\SetTimezone::class);
-        
-        // Add maintenance middleware globally (but with exceptions)
-        $middleware->append(\App\Http\Middleware\MaintenanceMode::class);
+        // Maintenance middleware tidak dipasang global agar urutan session & auth tetap benar
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
