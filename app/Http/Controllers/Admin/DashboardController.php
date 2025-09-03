@@ -56,9 +56,10 @@ class DashboardController extends Controller
         // Paginate data
         $data = $q->latest('presensi_at')->paginate(50)->withQueryString();
         
-        // REKAP GABUNGAN SEMUA PAGE (bukan hanya current page)
-        $rekapQuery = clone $q;
-        $allRecords = $rekapQuery->get();
+        // REKAP PER SESI DARI SEMUA DATA (TIDAK TERPENGARUH FILTER APAPUN)
+        // Ambil SEMUA data presensi untuk rekap sesi yang konsisten
+        $allPresence = Absensi::all();
+        $totalAllPresence = $allPresence->count();
         
         // Normalisasi dan rekap per sesi untuk SEMUA data
         $canonicalSessions = [
@@ -72,7 +73,7 @@ class DashboardController extends Controller
             $rekapMap[$key] = 0;
         }
 
-        foreach ($allRecords as $record) {
+        foreach ($allPresence as $record) {
             $sesiNormalized = KelasNormalizer::normalizeSesi($record->sesi_presensi);
             
             $matched = false;
@@ -90,14 +91,14 @@ class DashboardController extends Controller
             }
         }
 
-        // Susun rekap untuk view (dengan persentase)
+        // Susun rekap untuk view (dengan persentase berdasarkan SEMUA data)
         $rekapPerSesi = collect();
         foreach ($rekapMap as $label => $count) {
             if ($count === 0) continue; // sembunyikan yang kosong agar rapi
             $rekapPerSesi->push([
                 'label' => $label,
                 'total' => $count,
-                'percent' => $totalRecords > 0 ? round($count / $totalRecords * 100, 1) : 0
+                'percent' => $totalAllPresence > 0 ? round($count / $totalAllPresence * 100, 1) : 0
             ]);
         }
 
@@ -110,7 +111,7 @@ class DashboardController extends Controller
         $rekapPerKelas = collect();
         $kelasMap = [];
         
-        foreach ($allRecords as $record) {
+        foreach ($allPresence as $record) {
             $kelasNormalized = KelasNormalizer::normalize($record->kelas);
             $kelasMap[$kelasNormalized] = ($kelasMap[$kelasNormalized] ?? 0) + 1;
         }
@@ -128,7 +129,7 @@ class DashboardController extends Controller
         $rekapPerKonsentrasi = collect();
         $konsentrasiMap = [];
         
-        foreach ($allRecords as $record) {
+        foreach ($allPresence as $record) {
             $konsentrasi = trim($record->konsentrasi_keahlian);
             $konsentrasiMap[$konsentrasi] = ($konsentrasiMap[$konsentrasi] ?? 0) + 1;
         }
@@ -162,6 +163,6 @@ class DashboardController extends Controller
             'rekapPerKelas',
             'rekapPerKonsentrasi',
             'sessionColors'
-        ))->with('totalAllRecords', $totalRecords);
+        ))->with('totalAllRecords', $totalAllPresence);
     }
 }
