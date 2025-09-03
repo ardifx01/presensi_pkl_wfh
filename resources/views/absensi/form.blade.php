@@ -26,13 +26,31 @@
         <div class="alert alert-secondary d-flex justify-content-between align-items-center py-2 small mb-2">
             <div>
                 <strong>{{ auth()->user()->email }}</strong>
+                @if(auth()->user()->is_testing)
+                    <span class="badge bg-success ms-2">TESTING MODE</span>
+                @endif
+                @if(auth()->user()->is_admin)
+                    <span class="badge bg-warning ms-2">ADMIN</span>
+                @endif
                 <span class="text-muted ms-2">| <a href="#" onclick="event.preventDefault();document.getElementById('logout-form').submit();">Logout</a></span>
             </div>
         </div>
         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
-        <div class="alert alert-warning small mb-3">
-            Nama, alamat email, dan foto yang terkait dengan Akun Google Anda akan direkam saat Anda mengupload file dan mengirimkan formulir ini.
-        </div>
+        
+        @if(auth()->user()->is_testing)
+            <div class="alert alert-success small mb-3">
+                <i class="fas fa-flask me-1"></i>
+                <strong>MODE TESTING AKTIF:</strong> Anda bisa absen kapan saja tanpa batasan waktu. Sistem akan mencatat waktu sebenarnya untuk testing.
+                @if(auth()->user()->is_admin)
+                    <br><i class="fas fa-user-shield me-1"></i>
+                    <strong>AKSES ADMIN:</strong> Anda juga bisa mengakses <a href="{{ route('admin.dashboard') }}" class="text-decoration-none">dashboard admin</a>.
+                @endif
+            </div>
+        @else
+            <div class="alert alert-warning small mb-3">
+                Nama, alamat email, dan foto yang terkait dengan Akun Google Anda akan direkam saat Anda mengupload file dan mengirimkan formulir ini.
+            </div>
+        @endif
     @else
         <div class="alert alert-secondary small mb-3">
             Belum login dengan Google. <a href="{{ route('google.redirect') }}">Login dengan akun Google</a> (opsional, Anda masih bisa isi manual tanpa login).
@@ -49,6 +67,10 @@
 
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+
+    @if(session('info'))
+        <div class="alert alert-info">{{ session('info') }}</div>
     @endif
 
     @if($errors->any())

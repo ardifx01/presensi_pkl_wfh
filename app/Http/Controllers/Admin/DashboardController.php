@@ -10,6 +10,11 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
+        // Redirect testing user ke form presensi
+        if (auth()->check() && auth()->user()->is_testing) {
+            return redirect()->route('absensi.create')->with('info', 'Akun testing dialihkan ke form presensi.');
+        }
+        
         $q = Absensi::query();
         if ($request->filled('sesi')) {
             $q->where('sesi_presensi', $request->sesi);

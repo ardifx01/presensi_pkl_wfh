@@ -44,11 +44,17 @@ class AbsensiController extends Controller
             'Siang (13.00-15.00 WIB)' => ['start' => '13:00', 'end' => '15:00'],
             'Malam (16.30-23.59 WIB)' => ['start' => '16:30', 'end' => '23:59'],
         ];
-        $window = $sessionWindows[$validated['sesi_presensi']];
-        $start = $now->copy()->setTime(...explode(':', $window['start']));
-        $end = $now->copy()->setTime(...explode(':', $window['end']));
-        if (!($now->between($start, $end))) {
-            return back()->withErrors(['sesi_presensi' => 'Presensi untuk sesi ini hanya boleh antara '.$window['start'].' - '.$window['end'].' WIB'])->withInput();
+        
+        // Bypass validasi waktu untuk user testing
+        $isTestingUser = auth()->check() && auth()->user()->is_testing;
+        
+        if (!$isTestingUser) {
+            $window = $sessionWindows[$validated['sesi_presensi']];
+            $start = $now->copy()->setTime(...explode(':', $window['start']));
+            $end = $now->copy()->setTime(...explode(':', $window['end']));
+            if (!($now->between($start, $end))) {
+                return back()->withErrors(['sesi_presensi' => 'Presensi untuk sesi ini hanya boleh antara '.$window['start'].' - '.$window['end'].' WIB'])->withInput();
+            }
         }
 
         // Normalisasi nama murid & kelas (trim) untuk pencarian
