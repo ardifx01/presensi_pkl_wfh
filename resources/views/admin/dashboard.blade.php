@@ -236,11 +236,11 @@
                     @if(isset($rekapPerKelas) && $rekapPerKelas->count())
                         <div class="row">
                             @foreach($rekapPerKelas as $rk)
-                                @php $percent = $totalRecords ? round($rk->total / $totalRecords * 100,1) : 0; @endphp
+                                @php $percent = $totalRecords ? round($rk['total'] / $totalRecords * 100,1) : 0; @endphp
                                 <div class="col-md-6 mb-3">
                                     <div class="small d-flex justify-content-between">
-                                        <span>{{ $rk->kelas }}</span>
-                                        <span>{{ $rk->total }}</span>
+                                        <span>{{ $rk['kelas'] }}</span>
+                                        <span>{{ $rk['total'] }}</span>
                                     </div>
                                     <div class="progress" style="height:5px;">
                                         <div class="progress-bar bg-info" style="width: {{ $percent }}%"></div>
@@ -260,11 +260,11 @@
                     @if(isset($rekapPerKonsentrasi) && $rekapPerKonsentrasi->count())
                         <div class="row">
                             @foreach($rekapPerKonsentrasi as $rk2)
-                                @php $percent2 = $totalRecords ? round($rk2->total / $totalRecords * 100,1) : 0; @endphp
+                                @php $percent2 = $totalRecords ? round($rk2['total'] / $totalRecords * 100,1) : 0; @endphp
                                 <div class="col-md-6 mb-3">
                                     <div class="small d-flex justify-content-between">
-                                        <span>{{ \Illuminate\Support\Str::limit($rk2->konsentrasi_keahlian, 18) }}</span>
-                                        <span>{{ $rk2->total }}</span>
+                                        <span>{{ \Illuminate\Support\Str::limit($rk2['konsentrasi_keahlian'], 18) }}</span>
+                                        <span>{{ $rk2['total'] }}</span>
                                     </div>
                                     <div class="progress" style="height:5px;">
                                         <div class="progress-bar bg-success" style="width: {{ $percent2 }}%"></div>
