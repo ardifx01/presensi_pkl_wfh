@@ -1,0 +1,20 @@
+[
+    {
+        "id": 84,
+        "user_id": 7,
+        "user_email": "testing@smkn1sby.sch.id",
+        "konsentrasi_keahlian": "REKAYASA PERANGKAT LUNAK",
+        "nama_murid": "Testing User",
+        "kelas": "12 RPL 2",
+        "nama_perusahaan": "SMKN 1 Surabaya",
+        "alamat_perusahaan": "Jl. Smeas",
+        "nama_pembimbing_sekolah": "Pak Ainun",
+        "nama_pembimbing_dudika": "Bu Fitrah Maharani Humaira,M.Kom",
+        "sesi_presensi": "Siang (13.00-15.00 WIB)",
+        "presensi_at": "2025-09-03T06:00:59.000000Z",
+        "presensi_date": "2025-09-02T17:00:00.000000Z",
+        "foto_path": "absensi_foto\/UXi9O0MEzS51AuT0oxaHMh74hITfUR3SEnSsslLK.jpg",
+        "created_at": "2025-09-03T06:00:59.000000Z",
+        "updated_at": "2025-09-03T06:06:35.000000Z"
+    }
+]

@@ -2,23 +2,17 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AbsensiController;
-use App\Http\Controllers\Auth\EmailAuthController;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\DashboardController;
 
 Route::get('/', fn() => redirect()->route('login'));
 
-// Auth routes (Google login + Admin login)
-Route::get('/login', [EmailAuthController::class,'show'])->name('login');
-Route::get('/login/link', fn() => redirect()->route('login'))->name('login.link'); // Redirect GET to login page
-Route::post('/admin/login', [EmailAuthController::class, 'adminLogin'])->name('admin.login');
-// Removed Google OAuth routes (migrated to passwordless email). If needed later, re-add here.
-Route::post('/login/link', [EmailAuthController::class,'send'])->name('login.email.send');
-Route::get('/login/magic', [EmailAuthController::class,'magic'])->name('login.magic');
-Route::get('/login/reset-cooldown', function() {
-    session()->forget('last_login_link_sent_at');
-    return redirect()->route('login')->with('status', '🔄 Cooldown direset. Anda bisa kirim email lagi.');
-})->name('login.reset.cooldown');
-Route::post('/logout', [EmailAuthController::class, 'logout'])->name('logout');
+// Authentication routes
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [LoginController::class, 'login']);
+Route::get('/register', [LoginController::class, 'showRegistrationForm'])->name('register');
+Route::post('/register', [LoginController::class, 'register']);
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Protected routes - hanya untuk user yang sudah login
 Route::middleware('auth')->group(function() {

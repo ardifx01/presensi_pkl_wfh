@@ -48,12 +48,13 @@
             </div>
         @else
             <div class="alert alert-warning small mb-3">
-                Nama, alamat email, dan foto yang terkait dengan Akun Google Anda akan direkam saat Anda mengupload file dan mengirimkan formulir ini.
+                <i class="fas fa-exclamation-triangle me-1"></i>Data pribadi Anda akan direkam saat mengupload foto dan mengirimkan formulir presensi ini.
             </div>
         @endif
     @else
-        <div class="alert alert-secondary small mb-3">
-            Belum login dengan Google. <a href="{{ route('google.redirect') }}">Login dengan akun Google</a> (opsional, Anda masih bisa isi manual tanpa login).
+        <div class="alert alert-info small mb-3">
+            <i class="fas fa-info-circle me-1"></i>Belum login? <a href="{{ route('login') }}" class="text-decoration-none">Login di sini</a> untuk melihat riwayat presensi Anda. 
+            <br><small class="text-muted">Atau <a href="{{ route('register') }}" class="text-decoration-none">daftar akun baru</a> jika belum memiliki akun.</small>
         </div>
     @endauth
     <p>Silahkan untuk Presensi selama WFH murid PKL Tahun 2025</p>
@@ -67,6 +68,12 @@
 
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+    
+    @if(session('warning'))
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle me-2"></i>{{ session('warning') }}
+        </div>
     @endif
 
     @if(session('info'))
@@ -130,12 +137,42 @@
         </div>
         <div class="mb-3">
             <label class="form-label">Sesi Presensi *</label>
-            <select name="sesi_presensi" class="form-select" required>
+            <div class="d-flex align-items-center mb-2">
+                <small class="text-muted me-2">Waktu sekarang:</small>
+                <span id="currentTime" class="badge bg-info"></span>
+                <small class="text-muted ms-2">|</small>
+                <span id="suggestedSession" class="badge ms-2"></span>
+            </div>
+            <select name="sesi_presensi" class="form-select" id="sesiSelect" required>
                 <option value="">Pilih Sesi</option>
+                @php
+                    $now = now('Asia/Jakarta');
+                    $currentHour = $now->format('H:i');
+                    $currentSession = '';
+                    
+                    if ($currentHour >= '09:00' && $currentHour <= '12:00') {
+                        $currentSession = 'Pagi (09.00-12.00 WIB)';
+                    } elseif ($currentHour >= '13:00' && $currentHour <= '15:00') {
+                        $currentSession = 'Siang (13.00-15.00 WIB)';
+                    } elseif ($currentHour >= '16:30' && $currentHour <= '23:59') {
+                        $currentSession = 'Malam (16.30-23.59 WIB)';
+                    }
+                @endphp
                 @foreach(['Pagi (09.00-12.00 WIB)','Siang (13.00-15.00 WIB)','Malam (16.30-23.59 WIB)'] as $s)
-                    <option value="{{ $s }}" @selected(old('sesi_presensi')==$s)>{{ $s }}</option>
+                    <option value="{{ $s }}" 
+                            @selected(old('sesi_presensi', $currentSession) == $s)
+                            @if($s == $currentSession) data-current="true" @endif>
+                        {{ $s }}
+                        @if($s == $currentSession)
+                            ✓ (Sesuai waktu sekarang)
+                        @endif
+                    </option>
                 @endforeach
             </select>
+            <div id="sessionWarning" class="alert alert-warning mt-2 d-none">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <span id="warningText"></span>
+            </div>
         </div>
         <div class="mb-3">
             <label class="form-label">Upload Foto Murid PKL (boleh selfi) dilengkapi dengan Timestamp * (format gambar)</label>
@@ -155,6 +192,93 @@
 </div>
 
 <script>
+// Real-time clock
+function updateClock() {
+    const now = new Date();
+    const options = {
+        timeZone: 'Asia/Jakarta',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    };
+    const timeString = now.toLocaleTimeString('id-ID', options);
+    document.getElementById('currentTime').textContent = timeString + ' WIB';
+    
+    // Update suggested session
+    updateSuggestedSession(now);
+}
+
+function updateSuggestedSession(now) {
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const currentTime = hours * 100 + minutes; // Convert to HHMM format for easier comparison
+    
+    const sessions = {
+        'Pagi (09.00-12.00 WIB)': { start: 900, end: 1200, color: 'success' },
+        'Siang (13.00-15.00 WIB)': { start: 1300, end: 1500, color: 'warning' },
+        'Malam (16.30-23.59 WIB)': { start: 1630, end: 2359, color: 'info' }
+    };
+    
+    let suggestedSession = '';
+    let sessionColor = 'secondary';
+    
+    for (const [sessionName, timeRange] of Object.entries(sessions)) {
+        if (currentTime >= timeRange.start && currentTime <= timeRange.end) {
+            suggestedSession = '✓ ' + sessionName;
+            sessionColor = timeRange.color;
+            break;
+        }
+    }
+    
+    if (!suggestedSession) {
+        suggestedSession = '⚠️ Di luar jam sesi';
+        sessionColor = 'danger';
+    }
+    
+    const suggestedElement = document.getElementById('suggestedSession');
+    suggestedElement.textContent = suggestedSession;
+    suggestedElement.className = `badge bg-${sessionColor}`;
+}
+
+// Session validation
+function validateSession() {
+    const selectedSession = document.getElementById('sesiSelect').value;
+    const warningDiv = document.getElementById('sessionWarning');
+    const warningText = document.getElementById('warningText');
+    
+    if (!selectedSession) {
+        warningDiv.classList.add('d-none');
+        return;
+    }
+    
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const currentTime = hours * 100 + minutes;
+    
+    const sessionTimes = {
+        'Pagi (09.00-12.00 WIB)': { start: 900, end: 1200 },
+        'Siang (13.00-15.00 WIB)': { start: 1300, end: 1500 },
+        'Malam (16.30-23.59 WIB)': { start: 1630, end: 2359 }
+    };
+    
+    const session = sessionTimes[selectedSession];
+    if (session && (currentTime < session.start || currentTime > session.end)) {
+        @if(auth()->check() && auth()->user()->is_testing)
+            warningText.textContent = `MODE TESTING: Anda memilih sesi "${selectedSession}" pada waktu ${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')} WIB. Ini diizinkan untuk testing.`;
+            warningDiv.className = 'alert alert-info mt-2';
+        @else
+            warningText.textContent = `Peringatan: Anda memilih sesi "${selectedSession}" tetapi waktu sekarang ${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')} WIB tidak sesuai dengan sesi tersebut.`;
+            warningDiv.className = 'alert alert-warning mt-2';
+        @endif
+        warningDiv.classList.remove('d-none');
+    } else {
+        warningDiv.classList.add('d-none');
+    }
+}
+
+// File validation
 document.getElementById('foto_murid').addEventListener('change', function(e) {
     const file = e.target.files[0];
     const errorDiv = document.getElementById('file-error');
@@ -174,6 +298,14 @@ document.getElementById('foto_murid').addEventListener('change', function(e) {
         }
     }
 });
+
+// Event listeners
+document.getElementById('sesiSelect').addEventListener('change', validateSession);
+
+// Initialize
+updateClock();
+setInterval(updateClock, 1000); // Update every second
+validateSession(); // Initial validation
 </script>
 </body>
 </html>

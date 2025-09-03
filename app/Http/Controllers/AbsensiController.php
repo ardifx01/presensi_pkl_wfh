@@ -38,22 +38,34 @@ class AbsensiController extends Controller
         ]);
 
         // Validasi jam sesuai sesi dengan rentang waktu yang baru
-        $now = now();
+        $now = now('Asia/Jakarta'); // Pastikan menggunakan timezone Indonesia
         $sessionWindows = [
             'Pagi (09.00-12.00 WIB)' => ['start' => '09:00', 'end' => '12:00'],
             'Siang (13.00-15.00 WIB)' => ['start' => '13:00', 'end' => '15:00'],
             'Malam (16.30-23.59 WIB)' => ['start' => '16:30', 'end' => '23:59'],
         ];
         
-        // Bypass validasi waktu untuk user testing
+        // Bypass validasi waktu untuk user testing (tapi tetap ada batasan masuk akal)
         $isTestingUser = auth()->check() && auth()->user()->is_testing;
         
         if (!$isTestingUser) {
+            // Validasi ketat untuk user biasa
             $window = $sessionWindows[$validated['sesi_presensi']];
             $start = $now->copy()->setTime(...explode(':', $window['start']));
             $end = $now->copy()->setTime(...explode(':', $window['end']));
+            
             if (!($now->between($start, $end))) {
-                return back()->withErrors(['sesi_presensi' => 'Presensi untuk sesi ini hanya boleh antara '.$window['start'].' - '.$window['end'].' WIB'])->withInput();
+                return back()->withErrors(['sesi_presensi' => 'Presensi untuk sesi ini hanya boleh antara '.$window['start'].' - '.$window['end'].' WIB. Waktu sekarang: '.$now->format('H:i')])->withInput();
+            }
+        } else {
+            // Untuk testing user, tetap beri peringatan jika waktu tidak sesuai sesi
+            $window = $sessionWindows[$validated['sesi_presensi']];
+            $start = $now->copy()->setTime(...explode(':', $window['start']));
+            $end = $now->copy()->setTime(...explode(':', $window['end']));
+            
+            if (!($now->between($start, $end))) {
+                // Beri warning tapi tetap izinkan (untuk testing)
+                session()->flash('warning', 'TESTING MODE: Anda absen di luar jam sesi ('.$validated['sesi_presensi'].') pada waktu '.$now->format('H:i').'. Ini hanya diizinkan untuk testing.');
             }
         }
 
