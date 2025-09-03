@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Absensi;
 use Illuminate\Http\Request;
+use App\Helpers\KelasNormalizer;
 
 class DashboardController extends Controller
 {
@@ -16,9 +17,29 @@ class DashboardController extends Controller
         }
         
         $q = Absensi::query();
+        
+        // Filter sesi dengan normalisasi
         if ($request->filled('sesi')) {
-            $q->where('sesi_presensi', $request->sesi);
+            $sesiFilter = $request->sesi;
+            $q->where(function($query) use ($sesiFilter) {
+                // Cari berdasarkan nama canonical dan variants
+                $canonicalSessions = [
+                    'Pagi (09.00-12.00 WIB)' => ['pagi', '10.00', '09.00', 'morning'],
+                    'Siang (13.00-15.00 WIB)' => ['siang', '14.00', '13.00', 'afternoon'], 
+                    'Malam (16.30-23.59 WIB)' => ['malam', '16.30', 'sore', '17.00', 'evening', 'night']
+                ];
+                
+                if (isset($canonicalSessions[$sesiFilter])) {
+                    $query->where('sesi_presensi', $sesiFilter);
+                    foreach ($canonicalSessions[$sesiFilter] as $variant) {
+                        $query->orWhere('sesi_presensi', 'like', '%' . $variant . '%');
+                    }
+                } else {
+                    $query->where('sesi_presensi', 'like', '%' . $sesiFilter . '%');
+                }
+            });
         }
+        
         if ($request->filled('kelas')) {
             $q->where('kelas', 'like', '%'.$request->kelas.'%');
         }
@@ -29,38 +50,43 @@ class DashboardController extends Controller
             $q->where('konsentrasi_keahlian', $request->konsentrasi);
         }
         
-        // Get total count before pagination
+        // Get total count untuk rekap gabungan semua page
         $totalRecords = $q->count();
         
+        // Paginate data
         $data = $q->latest('presensi_at')->paginate(50)->withQueryString();
-        // Normalisasi nama sesi agar konsisten (data lama & baru)
+        
+        // REKAP GABUNGAN SEMUA PAGE (bukan hanya current page)
+        $rekapQuery = clone $q;
+        $allRecords = $rekapQuery->get();
+        
+        // Normalisasi dan rekap per sesi untuk SEMUA data
         $canonicalSessions = [
-            'Pagi (09.00-12.00 WIB)'  => ['pagi', '10.00', '09.00'],
-            'Siang (13.00-15.00 WIB)' => ['siang', '14.00', '13.00'],
-            'Malam (16.30-23.59 WIB)' => ['malam', '16.30', 'sore', '17.00']
+            'Pagi (09.00-12.00 WIB)' => ['pagi', '10.00', '09.00', 'morning'],
+            'Siang (13.00-15.00 WIB)' => ['siang', '14.00', '13.00', 'afternoon'],
+            'Malam (16.30-23.59 WIB)' => ['malam', '16.30', 'sore', '17.00', 'evening', 'night']
         ];
 
-        // Ambil semua sesi (hanya kolom sesi)
-        $sessionValues = (clone $q)->pluck('sesi_presensi');
         $rekapMap = [];
         foreach (array_keys($canonicalSessions) as $key) {
             $rekapMap[$key] = 0;
         }
 
-        foreach ($sessionValues as $value) {
-            $valLower = strtolower($value ?? '');
+        foreach ($allRecords as $record) {
+            $sesiNormalized = KelasNormalizer::normalizeSesi($record->sesi_presensi);
+            
             $matched = false;
             foreach ($canonicalSessions as $canonical => $needles) {
                 foreach ($needles as $needle) {
-                    if (str_contains($valLower, $needle)) {
+                    if (stripos($record->sesi_presensi, $needle) !== false || $sesiNormalized === $canonical) {
                         $rekapMap[$canonical]++;
                         $matched = true;
                         break 2;
                     }
                 }
             }
-            if (!$matched && $value) { // sesi yang tidak terdeteksi, tampilkan apa adanya
-                $rekapMap[$value] = ($rekapMap[$value] ?? 0) + 1;
+            if (!$matched && $record->sesi_presensi) {
+                $rekapMap[$record->sesi_presensi] = ($rekapMap[$record->sesi_presensi] ?? 0) + 1;
             }
         }
 
@@ -80,49 +106,47 @@ class DashboardController extends Controller
             return array_search($item['label'], array_keys($canonicalSessions));
         })->values();
 
-        // Rekap per kelas - buat query baru untuk menghindari konflik ORDER BY dengan GROUP BY
-        $rekapPerKelasQuery = Absensi::query();
-        if ($request->filled('sesi')) {
-            $rekapPerKelasQuery->where('sesi_presensi', $request->sesi);
-        }
-        if ($request->filled('kelas')) {
-            $rekapPerKelasQuery->where('kelas', 'like', '%'.$request->kelas.'%');
-        }
-        if ($request->filled('tanggal')) {
-            $rekapPerKelasQuery->whereDate('presensi_date', $request->tanggal);
-        }
-        if ($request->filled('konsentrasi')) {
-            $rekapPerKelasQuery->where('konsentrasi_keahlian', $request->konsentrasi);
+        // Normalisasi kelas untuk rekap SEMUA DATA
+        $rekapPerKelas = collect();
+        $kelasMap = [];
+        
+        foreach ($allRecords as $record) {
+            $kelasNormalized = KelasNormalizer::normalize($record->kelas);
+            $kelasMap[$kelasNormalized] = ($kelasMap[$kelasNormalized] ?? 0) + 1;
         }
         
-        $rekapPerKelas = $rekapPerKelasQuery
-            ->select('kelas')
-            ->selectRaw('count(*) as total')
-            ->groupBy('kelas')
-            ->orderBy('kelas')
-            ->get();
+        foreach ($kelasMap as $kelas => $count) {
+            $rekapPerKelas->push([
+                'kelas' => $kelas,
+                'total' => $count
+            ]);
+        }
+        
+        $rekapPerKelas = $rekapPerKelas->sortBy('kelas');
 
-        // Rekap per konsentrasi - buat query baru untuk menghindari konflik ORDER BY dengan GROUP BY
-        $rekapPerKonsentrasiQuery = Absensi::query();
-        if ($request->filled('sesi')) {
-            $rekapPerKonsentrasiQuery->where('sesi_presensi', $request->sesi);
-        }
-        if ($request->filled('kelas')) {
-            $rekapPerKonsentrasiQuery->where('kelas', 'like', '%'.$request->kelas.'%');
-        }
-        if ($request->filled('tanggal')) {
-            $rekapPerKonsentrasiQuery->whereDate('presensi_date', $request->tanggal);
-        }
-        if ($request->filled('konsentrasi')) {
-            $rekapPerKonsentrasiQuery->where('konsentrasi_keahlian', $request->konsentrasi);
+        // Rekap per konsentrasi - normalisasi dari SEMUA DATA
+        $rekapPerKonsentrasi = collect();
+        $konsentrasiMap = [];
+        
+        foreach ($allRecords as $record) {
+            $konsentrasi = trim($record->konsentrasi_keahlian);
+            $konsentrasiMap[$konsentrasi] = ($konsentrasiMap[$konsentrasi] ?? 0) + 1;
         }
         
-        $rekapPerKonsentrasi = $rekapPerKonsentrasiQuery
-            ->select('konsentrasi_keahlian')
-            ->selectRaw('count(*) as total')
-            ->groupBy('konsentrasi_keahlian')
-            ->orderBy('konsentrasi_keahlian')
-            ->get();
+        foreach ($konsentrasiMap as $konsentrasi => $count) {
+            $rekapPerKonsentrasi->push([
+                'konsentrasi_keahlian' => $konsentrasi,
+                'total' => $count
+            ]);
+        }
+        
+        $rekapPerKonsentrasi = $rekapPerKonsentrasi->sortBy('konsentrasi_keahlian');
+
+        // Normalisasi kelas untuk display di tabel utama
+        foreach ($data as $item) {
+            $item->kelas_normalized = KelasNormalizer::normalize($item->kelas);
+            $item->sesi_normalized = KelasNormalizer::normalizeSesi($item->sesi_presensi);
+        }
 
         // Warna khusus per sesi
         $sessionColors = [

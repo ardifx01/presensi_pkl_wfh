@@ -323,9 +323,18 @@
                                         {{ $row->presensi_at }}
                                     @endif
                                 </td>
-                                <td>{{ $row->sesi_presensi }}</td>
+                                <td>
+                                    <span class="badge bg-{{ $sessionColors[$row->sesi_normalized] ?? 'secondary' }}">
+                                        {{ $row->sesi_normalized ?? $row->sesi_presensi }}
+                                    </span>
+                                </td>
                                 <td>{{ $row->nama_murid }}</td>
-                                <td>{{ $row->kelas }}</td>
+                                <td>
+                                    <strong>{{ $row->kelas_normalized ?? $row->kelas }}</strong>
+                                    @if($row->kelas_normalized !== $row->kelas)
+                                        <small class="text-muted d-block">{{ $row->kelas }}</small>
+                                    @endif
+                                </td>
                                 <td>{{ $row->konsentrasi_keahlian }}</td>
                                 <td>{{ $row->nama_perusahaan }}</td>
                                 <td>{{ $row->nama_pembimbing_sekolah }}</td>
