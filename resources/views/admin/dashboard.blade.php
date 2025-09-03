@@ -232,7 +232,7 @@
         <div class="row mb-4">
             <div class="col-md-4">
                 <div class="stats-card">
-                    <h6 class="mb-2">Total Presensi</h6>
+                    <h6 class="mb-2">Total Presensi <small class="text-muted">({{ $scopeLabel ?? 'Semua' }})</small></h6>
                     <h3 class="mb-0 text-primary">{{ $totalAllRecords }}</h3>
                 </div>
             </div>
@@ -254,7 +254,7 @@
                                 </div>
                             @endforeach
                         </div>
-                        <div class="text-end small text-muted">Total: {{ $totalAllRecords }} presensi</div>
+                        <div class="text-end small text-muted">Total: {{ $totalAllRecords }} presensi ({{ $scopeLabel ?? 'Semua' }})</div>
                     @else
                         <p class="text-muted mb-0">Belum ada data presensi</p>
                     @endif

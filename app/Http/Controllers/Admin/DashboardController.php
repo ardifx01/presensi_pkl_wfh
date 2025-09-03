@@ -99,10 +99,9 @@ class DashboardController extends Controller
             }
         }
 
-        // Susun rekap untuk view (dengan persentase berdasarkan SEMUA data)
+        // Susun rekap untuk view (tampilkan juga yang 0 agar terlihat lengkap)
         $rekapPerSesi = collect();
         foreach ($rekapMap as $label => $count) {
-            if ($count === 0) continue; // sembunyikan yang kosong agar rapi
             $rekapPerSesi->push([
                 'label' => $label,
                 'total' => $count,
@@ -164,6 +163,11 @@ class DashboardController extends Controller
             'Malam (16.30-23.59 WIB)' => 'dark',
         ];
 
+        // Label untuk menjelaskan cakupan data pada statistik
+        $scopeLabel = $isDaily
+            ? 'Harian (Hari Ini)'
+            : ($request->filled('tanggal') ? 'Tanggal Dipilih' : 'Filter Saat Ini');
+
         return view('admin.dashboard', compact(
             'data',
             'rekapPerSesi',
@@ -171,7 +175,8 @@ class DashboardController extends Controller
             'rekapPerKelas',
             'rekapPerKonsentrasi',
             'sessionColors',
-            'isDaily'
+            'isDaily',
+            'scopeLabel'
         ))->with('totalAllRecords', $totalAllPresence);
     }
 }
