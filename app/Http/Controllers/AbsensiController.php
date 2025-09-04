@@ -22,7 +22,7 @@ class AbsensiController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+    $validated = $request->validate([
             'konsentrasi_keahlian' => 'required|string|max:100',
             'nama_murid' => 'required|string|max:150',
             'kelas' => 'required|string|max:100',
@@ -104,11 +104,10 @@ class AbsensiController extends Controller
         }
 
         // Simpan foto
-        $path = $request->file('foto_murid')->store('absensi_foto', 'public');
-
-        $validated['foto_path'] = $path;
-        $validated['presensi_at'] = now();
-        $validated['presensi_date'] = $today;
+    $path = $request->file('foto_murid')->store('absensi_foto/'.date('Y-m-d'), 'public');
+    $validated['foto_path'] = $path; // simpan relative path di storage/app/public
+    $validated['presensi_at'] = now();
+    $validated['presensi_date'] = $today; // field baru (date saja)
         $validated['nama_murid'] = $nama; // simpan versi trim
         $validated['kelas'] = $kelas;
         if (auth()->check()) {

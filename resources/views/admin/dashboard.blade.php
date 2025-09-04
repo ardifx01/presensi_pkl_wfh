@@ -369,10 +369,10 @@
                                 <td>{{ $row->nama_pembimbing_sekolah }}</td>
                                 <td>{{ $row->nama_pembimbing_dudika }}</td>
                                 <td>
-                                    @if($row->foto_path)
+                                    @if($row->foto_path && $row->foto_path !== '0')
                                         <a href="{{ asset('storage/'.$row->foto_path) }}" target="_blank" class="btn btn-sm btn-outline-primary">Lihat</a>
                                     @else
-                                        -
+                                        <span class="badge bg-secondary">Tidak Ada</span>
                                     @endif
                                 </td>
                                 <td>{{ $row->user_email }}</td>
