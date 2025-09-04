@@ -12,6 +12,8 @@ use App\Http\Controllers\MaintenanceController;
 Route::get('/maintenance', [MaintenanceController::class, 'show'])->name('maintenance');
 Route::get('/api/maintenance/status', [MaintenanceController::class, 'checkStatus'])->name('maintenance.status');
 
+
+
 Route::get('/', function () {
     if (file_exists(storage_path('framework/maintenance'))) {
         return redirect()->route('maintenance');

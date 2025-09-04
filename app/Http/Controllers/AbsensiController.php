@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Absensi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Exports\AbsensiExport;
 use App\Exports\SimpleAbsensiExport;
@@ -22,7 +23,7 @@ class AbsensiController extends Controller
 
     public function store(Request $request)
     {
-    $validated = $request->validate([
+        $validated = $request->validate([
             'konsentrasi_keahlian' => 'required|string|max:100',
             'nama_murid' => 'required|string|max:150',
             'kelas' => 'required|string|max:100',
@@ -103,11 +104,63 @@ class AbsensiController extends Controller
             }
         }
 
-        // Simpan foto
-    $path = $request->file('foto_murid')->store('absensi_foto/'.date('Y-m-d'), 'public');
-    $validated['foto_path'] = $path; // simpan relative path di storage/app/public
-    $validated['presensi_at'] = now();
-    $validated['presensi_date'] = $today; // field baru (date saja)
+        // Debug dan simpan foto
+    Log::info('UPLOAD_DEBUG', [
+            'hasFile' => $request->hasFile('foto_murid'),
+            'fileInfo' => $request->file('foto_murid')?->getClientOriginalName(),
+            'size' => $request->file('foto_murid')?->getSize(),
+            'phpError' => $_FILES['foto_murid']['error'] ?? null,
+            'postMaxSize' => ini_get('post_max_size'),
+            'uploadMaxFilesize' => ini_get('upload_max_filesize'),
+        ]);
+
+        if (!$request->hasFile('foto_murid')) {
+            Log::error('UPLOAD_ERROR: No file received', [
+                'request_files' => array_keys($_FILES),
+                'foto_murid_error' => $_FILES['foto_murid']['error'] ?? 'not_found'
+            ]);
+            return back()->withErrors(['foto_murid' => 'File foto wajib diupload (server tidak menerima file).'])->withInput();
+        }
+
+        $file = $request->file('foto_murid');
+        
+        // Validasi file lebih detail
+        if (!$file->isValid()) {
+            Log::error('UPLOAD_ERROR: Invalid file', [
+                'error' => $file->getError(),
+                'errorMessage' => $file->getErrorMessage()
+            ]);
+            return back()->withErrors(['foto_murid' => 'File foto tidak valid: ' . $file->getErrorMessage()])->withInput();
+        }
+
+        // Simpan foto dengan error handling
+        try {
+            $path = $file->store('absensi_foto/'.date('Y-m-d'), 'public');
+            
+            if (!$path) {
+                throw new \Exception('Store method returned false');
+            }
+            
+            Log::info('UPLOAD_SUCCESS', [
+                'stored_path' => $path,
+                'full_path' => storage_path('app/public/' . $path),
+                'file_exists' => file_exists(storage_path('app/public/' . $path))
+            ]);
+            
+            $validated['foto_path'] = $path; // simpan relative path di storage/app/public
+            
+        } catch (\Exception $e) {
+            Log::error('UPLOAD_ERROR: Storage failed', [
+                'error' => $e->getMessage(),
+                'file_name' => $file->getClientOriginalName(),
+                'file_size' => $file->getSize(),
+                'storage_path' => storage_path('app/public'),
+                'is_writable' => is_writable(storage_path('app/public'))
+            ]);
+            return back()->withErrors(['foto_murid' => 'Gagal menyimpan foto: ' . $e->getMessage()])->withInput();
+        }
+        $validated['presensi_at'] = now();
+        $validated['presensi_date'] = $today; // field baru (date saja)
         $validated['nama_murid'] = $nama; // simpan versi trim
         $validated['kelas'] = $kelas;
         if (auth()->check()) {
@@ -115,10 +168,10 @@ class AbsensiController extends Controller
             $validated['user_email'] = auth()->user()->email;
         }
 
-    $absensi = Absensi::create($validated);
+        $absensi = Absensi::create($validated);
 
-    // Dispatch job to Google Sheets (queue: default)
-    AppendAbsensiToSheet::dispatch($absensi->id);
+        // Dispatch job to Google Sheets (queue: default)
+        AppendAbsensiToSheet::dispatch($absensi->id);
 
         return redirect()->route('absensi.create')->with('success', 'Presensi berhasil disimpan. Terima kasih.');
     }
