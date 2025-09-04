@@ -9,15 +9,25 @@ use Illuminate\Support\Str;
 
 class ResetAllStudentPasswords extends Command
 {
-    protected $signature = 'students:reset-passwords {--random : Gunakan password acak unik untuk setiap siswa} {--pw= : Set password kustom (override default)} {--dry-run : Hanya tampilkan yang akan diubah}';
+    // Tambah opsi: --emails=, --ids=, --kelas=
+    protected $signature = 'students:reset-passwords
+        {--emails= : Comma separated email list}
+        {--ids= : Comma separated user id list}
+        {--kelas= : Filter kelas persis (misal: "12 AK 4")}
+        {--random : Gunakan password acak unik untuk setiap siswa}
+        {--pw= : Set password kustom (override default)}
+        {--dry-run : Hanya tampilkan yang akan diubah}';
 
-    protected $description = 'Reset password seluruh siswa non-admin & non-testing, set temp_password & force ganti password';
+    protected $description = 'Reset password siswa (bisa semua / terpilih) + set temp_password & force ganti password';
 
     public function handle(): int
     {
         $useRandom = $this->option('random');
         $custom = $this->option('pw');
         $dry = $this->option('dry-run');
+        $emailsOpt = $this->option('emails');
+        $idsOpt = $this->option('ids');
+        $kelasOpt = $this->option('kelas');
 
         $default = $custom ?: 'defaultpass123';
 
@@ -27,23 +37,42 @@ class ResetAllStudentPasswords extends Command
                 $q->whereNull('is_testing')->orWhere('is_testing', false);
             });
 
+        if ($emailsOpt) {
+            $emails = collect(explode(',', $emailsOpt))
+                ->map(fn($e)=>trim($e))
+                ->filter()->unique();
+            $query->whereIn('email', $emails);
+        }
+
+        if ($idsOpt) {
+            $ids = collect(explode(',', $idsOpt))
+                ->map(fn($e)=>trim($e))
+                ->filter()->unique();
+            $query->whereIn('id', $ids);
+        }
+
+        if ($kelasOpt) {
+            // Asumsikan kolom kelas disimpan di kolom 'kelas' pada users
+            $query->where('kelas', $kelasOpt);
+        }
+
         $users = $query->get();
         if ($users->isEmpty()) {
-            $this->info('Tidak ada siswa ditemukan.');
+            $this->warn('Tidak ada user sesuai filter.');
             return self::SUCCESS;
         }
 
-        $this->info('Total siswa: '.$users->count());
-        $bar = $this->output->createProgressBar($users->count());
-        $bar->start();
-
+        $this->info('Jumlah user terpilih: '.$users->count());
         $rows = [];
+
         foreach ($users as $user) {
             $plain = $useRandom ? Str::password(10) : $default;
 
             $rows[] = [
-                'email' => $user->email,
-                'password' => $plain,
+                'ID' => $user->id,
+                'Email' => $user->email,
+                'Kelas' => $user->kelas ?? '-',
+                'Temp Password' => $plain,
             ];
 
             if (!$dry) {
@@ -54,17 +83,14 @@ class ResetAllStudentPasswords extends Command
                     'email_verified_at' => $user->email_verified_at ?? now(),
                 ])->save();
             }
-            $bar->advance();
         }
-        $bar->finish();
-        $this->newLine(2);
 
-        $this->table(['Email','Temp Password'], $rows);
+        $this->table(['ID','Email','Kelas','Temp Password'], $rows);
 
         if ($dry) {
-            $this->warn('DRY RUN: Tidak ada perubahan disimpan. Jalankan tanpa --dry-run untuk menerapkan.');
+            $this->warn('DRY RUN: Tidak ada perubahan disimpan.');
         } else {
-            $this->info('Selesai reset password semua siswa. Mereka akan dipaksa ganti saat login.');
+            $this->info('Selesai reset password.');
         }
 
         return self::SUCCESS;
