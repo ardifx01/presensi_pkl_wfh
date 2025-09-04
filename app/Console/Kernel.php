@@ -29,6 +29,14 @@ class Kernel extends ConsoleKernel
                  ->sundays()
                  ->at('02:00')
                  ->appendOutputTo(storage_path('logs/testing-cleanup.log'));
+
+    // NOTE: Command "students:reset-passwords" sengaja TIDAK dijadwalkan otomatis
+    // karena reset massal password siswa harus tindakan sadar admin.
+    // Jalankan manual jika diperlukan:
+    //   php artisan students:reset-passwords              (pakai defaultpass123)
+    //   php artisan students:reset-passwords --pw=Rahasia2025
+    //   php artisan students:reset-passwords --random    (acak unik per siswa)
+    //   php artisan students:reset-passwords --dry-run   (preview tanpa simpan)
     }
 
     /**

@@ -291,7 +291,7 @@
                         </p>
                     @else
                         <p class="mb-1 small text-muted">
-                            <i class="fas fa-key me-1"></i> Setelah login pertama dengan password sementara, Anda akan diminta mengganti password.
+                            <i class="fas fa-key me-1"></i> Password sementara untuk Murid yang melaksanakan PKL adalah <strong>defaultpass123</strong>.
                         </p>
                         <p class="mb-0 small">
                             <i class="fas fa-unlock-alt me-1"></i>
