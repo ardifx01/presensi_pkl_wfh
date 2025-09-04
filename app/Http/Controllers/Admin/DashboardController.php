@@ -17,20 +17,21 @@ class DashboardController extends Controller
             return redirect()->route('absensi.create')->with('info', 'Akun testing dialihkan ke form presensi.');
         }
         
-        $q = Absensi::query();
+    // Base query (akan dipakai untuk dua tujuan: rekap penuh & pagination)
+    $baseQuery = Absensi::query();
 
         // Default: tampilkan hanya presensi HARI INI kecuali user memberi filter tanggal
         $isDaily = false;
         if (!$request->filled('tanggal')) {
             $today = Carbon::today();
-            $q->whereDate('presensi_date', $today);
+            $baseQuery->whereDate('presensi_date', $today);
             $isDaily = true;
         }
         
         // Filter sesi dengan normalisasi
         if ($request->filled('sesi')) {
             $sesiFilter = $request->sesi;
-            $q->where(function($query) use ($sesiFilter) {
+            $baseQuery->where(function($query) use ($sesiFilter) {
                 // Cari berdasarkan nama canonical dan variants
                 $canonicalSessions = [
                     'Pagi (09.00-12.00 WIB)' => ['pagi', '10.00', '09.00', 'morning'],
@@ -50,24 +51,30 @@ class DashboardController extends Controller
         }
         
         if ($request->filled('kelas')) {
-            $q->where('kelas', 'like', '%'.$request->kelas.'%');
+            $baseQuery->where('kelas', 'like', '%'.$request->kelas.'%');
         }
         if ($request->filled('tanggal')) {
-            $q->whereDate('presensi_date', $request->tanggal);
+            $baseQuery->whereDate('presensi_date', $request->tanggal);
         }
         if ($request->filled('konsentrasi')) {
-            $q->where('konsentrasi_keahlian', $request->konsentrasi);
+            $baseQuery->where('konsentrasi_keahlian', $request->konsentrasi);
         }
         
-        // Get total count untuk rekap gabungan semua page
-        $totalRecords = $q->count();
-        
-        // Paginate data
-        $data = $q->latest('presensi_at')->paginate(50)->withQueryString();
-        
-    // Ambil dataset untuk rekap (mengikuti default harian atau filter yang dipilih)
-    $allPresence = (clone $q)->get();
+        // Clone untuk rekap (FULL dataset TANPA limit/offset pagination)
+        $rekapQuery = clone $baseQuery; // aman sebelum pagination
+
+        // Ambil seluruh data untuk rekap & statistik
+        $allPresence = $rekapQuery->get();
         $totalAllPresence = $allPresence->count();
+
+        // Total record (bisa juga pakai $totalAllPresence agar konsisten)
+        $totalRecords = $totalAllPresence;
+
+        // Pagination: pakai clone terpisah agar tidak mempengaruhi rekap
+        $data = (clone $baseQuery)
+            ->latest('presensi_at')
+            ->paginate(50)
+            ->withQueryString();
         
         // Normalisasi dan rekap per sesi untuk SEMUA data
         $canonicalSessions = [
